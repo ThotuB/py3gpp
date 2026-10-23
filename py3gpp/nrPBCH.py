@@ -1,9 +1,10 @@
-
 # 38.211 7.4.3 SS/PBCH block
 
 import numpy as np
-from py3gpp.nrSymbolModulate import nrSymbolModulate
+
 from py3gpp.nrPBCHPRBS import nrPBCHPRBS
+from py3gpp.nrSymbolModulate import nrSymbolModulate
+
 
 def nrPBCH(ncellid, v, databits):
     n = len(databits)
@@ -17,6 +18,6 @@ def nrPBCH(ncellid, v, databits):
     scrambled_bits = np.bitwise_xor(databits, prbs_bits)
 
     # Modulation, Section 7.3.3.2, TS 38.211
-    res_sym = nrSymbolModulate(scrambled_bits, 'QPSK')
+    res_sym = nrSymbolModulate(scrambled_bits, "QPSK")
 
     return np.array(res_sym)

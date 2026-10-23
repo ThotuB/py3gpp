@@ -1,23 +1,25 @@
 import numpy as np
+
 from py3gpp.nrDLSCHInfo import getZlist
 
+
 def nrRateMatchLDPC(in_, outlen, rv, mod, nLayers):
-    assert rv in [0, 1, 2, 3], 'rv has to be in [0, 1, 2, 3]'
-    assert nLayers in [1, 2, 3, 4], 'nLayers has to be [1, 2, 3, 4]'
-    if mod in ['pi/2-BPSK', 'BPSK']:
+    assert rv in [0, 1, 2, 3], "rv has to be in [0, 1, 2, 3]"
+    assert nLayers in [1, 2, 3, 4], "nLayers has to be [1, 2, 3, 4]"
+    if mod in ["pi/2-BPSK", "BPSK"]:
         Qm = 1
-    elif mod == 'QPSK':
+    elif mod == "QPSK":
         Qm = 2
-    elif mod == '16QAM':
+    elif mod == "16QAM":
         Qm = 4
-    elif mod == '64QAM':
+    elif mod == "64QAM":
         Qm = 6
-    elif mod == '256QAM':
+    elif mod == "256QAM":
         Qm = 8
     else:
-        assert False, f'modulation type {mod} is not supported'
-    N = in_.shape[0] # length of each code word
-    C = in_.shape[1] # number of code words within this transport block
+        assert False, f"modulation type {mod} is not supported"
+    N = in_.shape[0]  # length of each code word
+    C = in_.shape[1]  # number of code words within this transport block
     Zlist = np.array(getZlist())
     if N in Zlist * 66:
         bgn = 1
@@ -26,7 +28,7 @@ def nrRateMatchLDPC(in_, outlen, rv, mod, nLayers):
         bgn = 2
         ncwnodes = 50
     else:
-        assert False, f'N = {N} is not supported'
+        assert False, f"N = {N} is not supported"
     Zc = int(N / ncwnodes)
 
     Ncb = N
@@ -60,25 +62,27 @@ def nrRateMatchLDPC(in_, outlen, rv, mod, nLayers):
 
     return rematched
 
+
 def _rateMatch(d, E, k0, Ncb, Qm):
     # E is number of bits after rate matching
-    N_filler_bits = np.count_nonzero(d[:Ncb,0] == -1, axis=0)
+    N_filler_bits = np.count_nonzero(d[:Ncb, 0] == -1, axis=0)
 
     d = np.tile(d, (np.ceil(E / (Ncb - N_filler_bits)).astype(int), 1))
 
     d = np.roll(d, -k0, axis=0)
 
-    e = d[d[:,0] != -1,:][:E]
+    e = d[d[:, 0] != -1, :][:E]
 
     # last bits of QAM modulates symbols are not as reliable as first ones
     # therefore map systematic bits to to first bits of each symbol
     # according to section 5.4.2.2
-    e = np.reshape(e, (Qm, int(E / Qm), -1)).ravel(order='F')
+    e = np.reshape(e, (Qm, int(E / Qm), -1)).ravel(order="F")
     return e
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     rv = 0
-    mod = 'QPSK'
+    mod = "QPSK"
     nLayers = 1
     outlen = 8000
     in_ = np.ones((3960, 2))

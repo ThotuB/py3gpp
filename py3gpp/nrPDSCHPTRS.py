@@ -1,13 +1,13 @@
-
 # 38.211
 
 import numpy as np
 
+from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
+from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
+from py3gpp.nrPDSCHDMRS import PDSCHDMRSSyms
 from py3gpp.nrPRBS import nrPRBS
 from py3gpp.nrSymbolModulate import nrSymbolModulate
-from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
-from py3gpp.nrPDSCHDMRS import PDSCHDMRSSyms
+
 
 def nrPDSCHPTRS(carrier: nrCarrierConfig, cfg: nrPDSCHConfig):
     if cfg.EnablePTRS == 0:
@@ -52,8 +52,8 @@ def PTRSPRBSet(cfg: nrPDSCHConfig):
     else:
         n_dmrs_per_re = 4
 
-    prb_set = np.array(cfg.PRBSet[kRBref::cfg.PTRS.FrequencyDensity])
-    prb_set = (prb_set*n_dmrs_per_re)+dmrsRef//2
+    prb_set = np.array(cfg.PRBSet[kRBref :: cfg.PTRS.FrequencyDensity])
+    prb_set = (prb_set * n_dmrs_per_re) + dmrsRef // 2
 
     return prb_set
 
@@ -66,7 +66,7 @@ def PDSCHPTRSSyms(carrier: nrCarrierConfig, cfg: nrPDSCHConfig):
     A_pos = cfg.DMRS.DMRSTypeAPosition
     td = cfg.PTRS.TimeDensity
 
-    ptrs_cnt = td-1
+    ptrs_cnt = td - 1
     occupied_syms = np.array([], dtype=int)
     for i in range(cfg.SymbolAllocation[0], carrier.SymbolsPerSlot):
         if i == A_pos:
@@ -85,5 +85,6 @@ def PDSCHPTRSSyms(carrier: nrCarrierConfig, cfg: nrPDSCHConfig):
 
     return occupied_syms
 
+
 def PDSCHPTRScinit(sps, n_slot, n_symb, NIDSCID, n_scid):
-    return 2**17 * (sps * n_slot + n_symb + 1) * (2*NIDSCID + 1) + 2*NIDSCID + n_scid
+    return 2**17 * (sps * n_slot + n_symb + 1) * (2 * NIDSCID + 1) + 2 * NIDSCID + n_scid

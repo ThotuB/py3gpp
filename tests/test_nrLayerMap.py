@@ -1,4 +1,5 @@
 import numpy as np
+
 from py3gpp.nrLayerMap import nrLayerMap
 
 
@@ -35,7 +36,7 @@ def test_nrLayerMap_two_codeword_array_list():
     assert np.array_equal(out, expected_result), f"Expected: {expected_result}, Actual: {out}"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_nrLayerMap_one_codeword_array()
     test_nrLayerMap_one_codeword_array_list()
     test_nrLayerMap_two_codeword_array_list()

@@ -1,5 +1,7 @@
 import numpy as np
+
 from py3gpp.helper import _calc_m_seq
+
 
 def nrPSS(ncellid):
     assert ncellid >= 0 and ncellid <= 1007, "invalid ncellid"
@@ -10,6 +12,7 @@ def nrPSS(ncellid):
     d_PSS = 1 - 2 * np.roll(m, -nrPSSv(ncellid))
     return d_PSS
 
+
 def nrPSSv(ncellid):
     n2 = ncellid % 3
-    return 43*n2
+    return 43 * n2

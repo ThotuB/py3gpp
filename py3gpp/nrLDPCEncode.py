@@ -1,8 +1,10 @@
 import numpy as np
 import scipy as sp
-from importlib_resources import files, as_file # importlib.resources only works for Python >= 3.9
-from py3gpp.nrDLSCHInfo import getZlist, getZarray
+from importlib_resources import as_file, files  # importlib.resources only works for Python >= 3.9
+
 from py3gpp import codes
+from py3gpp.nrDLSCHInfo import getZarray, getZlist
+
 
 # This function is from Sionna
 def _load_basegraph(i_ls, bgn):
@@ -14,9 +16,9 @@ def _load_basegraph(i_ls, bgn):
 
     # csv files are taken from 38.212 and dimension is explicitly given
     if bgn == 1:
-        bm = np.zeros([46, 68]) - 1 # init matrix with -1 (None positions)
+        bm = np.zeros([46, 68]) - 1  # init matrix with -1 (None positions)
     elif bgn == 2:
-        bm = np.zeros([42, 52]) - 1 # init matrix with -1 (None positions)
+        bm = np.zeros([42, 52]) - 1  # init matrix with -1 (None positions)
     else:
         raise ValueError("Basegraph not supported.")
 
@@ -31,23 +33,24 @@ def _load_basegraph(i_ls, bgn):
         # check for next row index
         if not np.isnan(bg_csv[r, 0]):
             r_ind = int(bg_csv[r, 0])
-        c_ind = int(bg_csv[r, 1]) # second column in csv is column index
-        value = bg_csv[r, i_ls + 2] # i_ls entries start at offset 2
+        c_ind = int(bg_csv[r, 1])  # second column in csv is column index
+        value = bg_csv[r, i_ls + 2]  # i_ls entries start at offset 2
         bm[r_ind, c_ind] = value
 
     return bm
+
 
 # This function is from Sionna
 def _lift_basegraph(bm, z):
     """Lift basegraph with lifting factor ``z`` and shifted identities as
     defined by the entries of ``bm``."""
 
-    num_nonzero = np.sum(bm>=0) # num of non-neg elements in bm
+    num_nonzero = np.sum(bm >= 0)  # num of non-neg elements in bm
 
     # init all non-zero row/column indices
-    r_idx = np.zeros(z*num_nonzero)
-    c_idx = np.zeros(z*num_nonzero)
-    data = np.ones(z*num_nonzero)
+    r_idx = np.zeros(z * num_nonzero)
+    c_idx = np.zeros(z * num_nonzero)
+    data = np.ones(z * num_nonzero)
 
     # row/column indices of identity matrix for lifting
     im = np.arange(z)
@@ -55,39 +58,39 @@ def _lift_basegraph(bm, z):
     idx = 0
     for r in range(bm.shape[0]):
         for c in range(bm.shape[1]):
-            if bm[r,c]==-1: # -1 is used as all-zero matrix placeholder
-                pass #do nothing (sparse)
+            if bm[r, c] == -1:  # -1 is used as all-zero matrix placeholder
+                pass  # do nothing (sparse)
             else:
                 # roll matrix by bm[r,c]
-                c_roll = np.mod(im+bm[r,c], z)
+                c_roll = np.mod(im + bm[r, c], z)
                 # append rolled identity matrix to pcm
-                r_idx[idx*z:(idx+1)*z] = r*z + im
-                c_idx[idx*z:(idx+1)*z] = c*z + c_roll
+                r_idx[idx * z : (idx + 1) * z] = r * z + im
+                c_idx[idx * z : (idx + 1) * z] = c * z + c_roll
                 idx += 1
 
     # generate lifted sparse matrix from indices
-    pcm = sp.sparse.csr_matrix((data,(r_idx, c_idx)),
-                                shape=(z*bm.shape[0], z*bm.shape[1]))
+    pcm = sp.sparse.csr_matrix((data, (r_idx, c_idx)), shape=(z * bm.shape[0], z * bm.shape[1]))
     return pcm
+
 
 # This function is from Sionna
 def _gen_submat(bm, k_b, z, bgn):
     """Split the basegraph into multiple sub-matrices such that efficient
     encoding is possible.
     """
-    g = 4 # code property (always fixed for 5G)
-    mb = bm.shape[0] # number of CN rows in basegraph (BG property)
+    g = 4  # code property (always fixed for 5G)
+    mb = bm.shape[0]  # number of CN rows in basegraph (BG property)
 
     bm_a = bm[0:g, 0:k_b]
-    bm_b = bm[0:g, k_b:(k_b+g)]
+    bm_b = bm[0:g, k_b : (k_b + g)]
     bm_c1 = bm[g:mb, 0:k_b]
-    bm_c2 = bm[g:mb, k_b:(k_b+g)]
+    bm_c2 = bm[g:mb, k_b : (k_b + g)]
 
     # H could be sliced immediately (but easier to implement if based on B)
     hm_a = _lift_basegraph(bm_a, z)
 
     # not required for encoding, but helpful for debugging
-    #hm_b = self._lift_basegraph(bm_b, z)
+    # hm_b = self._lift_basegraph(bm_b, z)
 
     hm_c1 = _lift_basegraph(bm_c1, z)
     hm_c2 = _lift_basegraph(bm_c2, z)
@@ -96,9 +99,10 @@ def _gen_submat(bm, k_b, z, bgn):
 
     return hm_a, hm_b_inv, hm_c1, hm_c2
 
+
 # This function is from Sionna
 def _find_hm_b_inv(bm_b, z, bgn):
-    """ For encoding we need to find the inverse of `hm_b` such that
+    """For encoding we need to find the inverse of `hm_b` such that
     `hm_b^-1 * hm_b = I`.
 
     Could be done sparse
@@ -138,13 +142,13 @@ def _find_hm_b_inv(bm_b, z, bgn):
     """
 
     # permutation indices
-    pm_a= int(bm_b[0,0])
+    pm_a = int(bm_b[0, 0])
     if bgn == 1:
         pm_b_inv = int(-bm_b[1, 0])
-    else: # structure of B is slightly different for bg2
+    else:  # structure of B is slightly different for bg2
         pm_b_inv = int(-bm_b[2, 0])
 
-    hm_b_inv = np.zeros([4*z, 4*z])
+    hm_b_inv = np.zeros([4 * z, 4 * z])
 
     im = np.eye(z)
 
@@ -154,36 +158,37 @@ def _find_hm_b_inv(bm_b, z, bgn):
 
     # row 0
     hm_b_inv[0:z, 0:z] = b_inv
-    hm_b_inv[0:z, z:2*z] = b_inv
-    hm_b_inv[0:z, 2*z:3*z] = b_inv
-    hm_b_inv[0:z, 3*z:4*z] = b_inv
+    hm_b_inv[0:z, z : 2 * z] = b_inv
+    hm_b_inv[0:z, 2 * z : 3 * z] = b_inv
+    hm_b_inv[0:z, 3 * z : 4 * z] = b_inv
 
     # row 1
-    hm_b_inv[z:2*z, 0:z] = im + ab_inv
-    hm_b_inv[z:2*z, z:2*z] = ab_inv
-    hm_b_inv[z:2*z, 2*z:3*z] = ab_inv
-    hm_b_inv[z:2*z, 3*z:4*z] = ab_inv
+    hm_b_inv[z : 2 * z, 0:z] = im + ab_inv
+    hm_b_inv[z : 2 * z, z : 2 * z] = ab_inv
+    hm_b_inv[z : 2 * z, 2 * z : 3 * z] = ab_inv
+    hm_b_inv[z : 2 * z, 3 * z : 4 * z] = ab_inv
 
     # row 2
     if bgn == 1:
-        hm_b_inv[2*z:3*z, 0:z] = ab_inv
-        hm_b_inv[2*z:3*z, z:2*z] = ab_inv
-        hm_b_inv[2*z:3*z, 2*z:3*z] = im + ab_inv
-        hm_b_inv[2*z:3*z, 3*z:4*z] = im + ab_inv
-    else: # for bg2 the structure is slightly different
-        hm_b_inv[2*z:3*z, 0:z] = im + ab_inv
-        hm_b_inv[2*z:3*z, z:2*z] = im + ab_inv
-        hm_b_inv[2*z:3*z, 2*z:3*z] = ab_inv
-        hm_b_inv[2*z:3*z, 3*z:4*z] = ab_inv
+        hm_b_inv[2 * z : 3 * z, 0:z] = ab_inv
+        hm_b_inv[2 * z : 3 * z, z : 2 * z] = ab_inv
+        hm_b_inv[2 * z : 3 * z, 2 * z : 3 * z] = im + ab_inv
+        hm_b_inv[2 * z : 3 * z, 3 * z : 4 * z] = im + ab_inv
+    else:  # for bg2 the structure is slightly different
+        hm_b_inv[2 * z : 3 * z, 0:z] = im + ab_inv
+        hm_b_inv[2 * z : 3 * z, z : 2 * z] = im + ab_inv
+        hm_b_inv[2 * z : 3 * z, 2 * z : 3 * z] = ab_inv
+        hm_b_inv[2 * z : 3 * z, 3 * z : 4 * z] = ab_inv
 
     # row 3
-    hm_b_inv[3*z:4*z, 0:z] = ab_inv
-    hm_b_inv[3*z:4*z, z:2*z] = ab_inv
-    hm_b_inv[3*z:4*z, 2*z:3*z] = ab_inv
-    hm_b_inv[3*z:4*z, 3*z:4*z] = im + ab_inv
+    hm_b_inv[3 * z : 4 * z, 0:z] = ab_inv
+    hm_b_inv[3 * z : 4 * z, z : 2 * z] = ab_inv
+    hm_b_inv[3 * z : 4 * z, 2 * z : 3 * z] = ab_inv
+    hm_b_inv[3 * z : 4 * z, 3 * z : 4 * z] = im + ab_inv
 
     # return results as sparse matrix
     return sp.sparse.csr_matrix(hm_b_inv)
+
 
 def _encode(s, pcm_a, pcm_b_inv, pcm_c1, pcm_c2):
     p_a = pcm_a * s
@@ -201,6 +206,7 @@ def _encode(s, pcm_a, pcm_b_inv, pcm_c1, pcm_c2):
 
     return c
 
+
 def _mul_sh(x, k):
     if k == -1:
         return np.zeros(len(x))
@@ -213,44 +219,44 @@ def _mul_sh(x, k):
 def _encode_thangaraj(B, Zc, msg):
     M, N = B.shape
     cw = np.zeros(N * Zc)
-    cw[:(N - M) * Zc] = msg # it's a systematic code
+    cw[: (N - M) * Zc] = msg  # it's a systematic code
 
     temp = np.zeros(Zc, int)
     for i in range(4):
         for j in range(N - M):
             temp = np.mod(temp + _mul_sh(msg[j * Zc :][:Zc], B[i, j]), 2)
-    
+
     p1_sh = B[1, N - M] if B[2, N - M] == -1 else B[2, N - M]
-    cw[(N - M) * Zc :][: Zc] = _mul_sh(temp, Zc - p1_sh)
+    cw[(N - M) * Zc :][:Zc] = _mul_sh(temp, Zc - p1_sh)
 
     # find p2, p3, p4
     for i in range(3):
         temp = np.zeros(Zc, int)
         for j in range(N - M + i + 1):
             temp = np.mod(temp + _mul_sh(cw[j * Zc :][:Zc], B[i, j]), 2)
-        cw[(N - M + i + 1) * Zc :][: Zc] = temp
+        cw[(N - M + i + 1) * Zc :][:Zc] = temp
 
     # remaining parities
     for i in range(4, M):
         temp = np.zeros(Zc, int)
         for j in range(N - M + 4):
             temp = np.mod(temp + _mul_sh(cw[j * Zc :][:Zc], B[i, j]), 2)
-        cw[(N - M + i) * Zc :][: Zc] = temp
+        cw[(N - M + i) * Zc :][:Zc] = temp
 
     return cw
 
 
-def nrLDPCEncode(cbs, bgn, algo = 'sionna'):
-    cbs = cbs.copy() # don't modify inputs
+def nrLDPCEncode(cbs, bgn, algo="sionna"):
+    cbs = cbs.copy()  # don't modify inputs
 
-    if algo not in ['sionna', 'thangaraj']:
+    if algo not in ["sionna", "thangaraj"]:
         raise TypeError('algo has to be "sionna" or "thangaraj"')
     if len(cbs.shape) != 2:
-        raise TypeError('cbs must be a 2-dimensional matrix')
+        raise TypeError("cbs must be a 2-dimensional matrix")
     K = cbs.shape[0]  # length of a code segment
     C = cbs.shape[1]  # number of code segments
     if not (11 < K < 8449):
-        raise ValueError('K must be 11 < K < 8449')
+        raise ValueError("K must be 11 < K < 8449")
 
     # calculate Zc
     if bgn == 1:
@@ -260,7 +266,7 @@ def nrLDPCEncode(cbs, bgn, algo = 'sionna'):
         nsys = 10
         ncwnodes = 50
     Zc = int(K / nsys)
-    assert Zc in getZlist(), f'Zc = {Zc} is not a valid value'
+    assert Zc in getZlist(), f"Zc = {Zc} is not a valid value"
 
     # calculate output size (N)
     N = int(Zc * ncwnodes)
@@ -279,7 +285,7 @@ def nrLDPCEncode(cbs, bgn, algo = 'sionna'):
         else:
             k_b = 6
     else:
-        raise ValueError(f'bgn = {bgn} is not supported')
+        raise ValueError(f"bgn = {bgn} is not supported")
 
     Zarray = getZarray()
     min_val = 100000
@@ -287,29 +293,29 @@ def nrLDPCEncode(cbs, bgn, algo = 'sionna'):
     for i, s in enumerate(Zarray):
         for s1 in s:
             x = k_b * s1
-            if  x >= K:
+            if x >= K:
                 # valid solution
                 if x < min_val:
                     min_val = x
                     i_ls = i
-    assert i is not None, 'could not find i_ls'
+    assert i is not None, "could not find i_ls"
     # print(f'K = {K}, bgn = {bgn} => Zc = {Zc}, k_b = {k_b}, N = {N}, R = {K / N}, i_ls = {i_ls}')
 
     # replace filler bits with 0
-    fill_indices = (cbs[:, 0] == -1)  # filler bits are at identical locations in every segment
-    cbs[fill_indices, :] = 0 # set filler bits to 0
+    fill_indices = cbs[:, 0] == -1  # filler bits are at identical locations in every segment
+    cbs[fill_indices, :] = 0  # set filler bits to 0
 
     # encode
     bm = _load_basegraph(i_ls, bgn)
 
-    if algo == 'sionna':
+    if algo == "sionna":
         pcm = _lift_basegraph(bm, Zc)
         pcm_a, pcm_b_inv, pcm_c1, pcm_c2 = _gen_submat(bm, k_b, Zc, bgn)
         # print(f'pcm = {pcm.shape[0]} x {pcm.shape[1]} matrix')
         for i in range(cbs.shape[1]):
             codedcbs[:, i] = _encode(cbs[:, i], pcm_a, pcm_b_inv, pcm_c1, pcm_c2)
 
-    elif algo == 'thangaraj':
+    elif algo == "thangaraj":
         for i in range(cbs.shape[1]):
             codedcbs[:, i] = _encode_thangaraj(bm, Zc, cbs[:, i])
 
@@ -328,15 +334,17 @@ def nrLDPCEncode(cbs, bgn, algo = 'sionna'):
 
     return codedcbs
 
+
 def _check_cw(B, Zc, cw):
     M, N = B.shape
     syn = np.zeros(M * Zc)
     for i in range(M):
         for j in range(N):
-            syn[i * Zc :][: Zc] = np.mod(syn[i * Zc :][: Zc] + _mul_sh(cw[j * Zc :][: Zc], B[i, j]), 2)
+            syn[i * Zc :][:Zc] = np.mod(syn[i * Zc :][:Zc] + _mul_sh(cw[j * Zc :][:Zc], B[i, j]), 2)
     return not np.any(syn)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     bgn = 2
     C = 2
     K = 2560
@@ -346,10 +354,10 @@ if __name__ == '__main__':
     cbs[0:10] = 0
     fillers = (-1) * np.ones((F, C))
     cbs = np.vstack((cbs, fillers))
-    codedcbs_1 = nrLDPCEncode(cbs.copy(), bgn, algo = 'sionna')
-    
-    codedcbs_2 = nrLDPCEncode(cbs, bgn, algo = 'thangaraj')
-    
+    codedcbs_1 = nrLDPCEncode(cbs.copy(), bgn, algo="sionna")
+
+    codedcbs_2 = nrLDPCEncode(cbs, bgn, algo="thangaraj")
+
     assert codedcbs_1.shape == (12800, 2)
     assert codedcbs_2.shape == (12800, 2)
     assert np.array_equal(codedcbs_1, codedcbs_2)

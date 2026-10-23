@@ -1,11 +1,20 @@
 import numpy as np
+
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.nrOFDMInfo import nrOFDMInfo
 
+
 # TODO: implement windowing
 def nrOFDMModulate(
-    carrier=None, grid=None, scs=None, initialNSlot=None, CyclicPrefix="normal", Nfft=None,
-    SampleRate=None, Windowing=None, CarrierFrequency=0
+    carrier=None,
+    grid=None,
+    scs=None,
+    initialNSlot=None,
+    CyclicPrefix="normal",
+    Nfft=None,
+    SampleRate=None,
+    Windowing=None,
+    CarrierFrequency=0,
 ):
     info = {}
 
@@ -21,7 +30,7 @@ def nrOFDMModulate(
         NSizeGrid = carrier.NSizeGrid
         if initialNSlot is None:
             initialNSlot = carrier.NSlot
-        
+
     if initialNSlot is None:
         initialNSlot = 0
 
@@ -58,7 +67,7 @@ def nrOFDMModulate(
     sample_pos_in_slot = 0
     for i in range(initialNSlot):
         sample_pos_in_slot += Nfft + N_cp[i]
-        
+
     for sym_pos_in_grid in range(nSlots):
         sym_pos_in_slot = (sym_pos_in_grid + initialNSlot) % carrier.SymbolsPerSlot
         symbol_len = Nfft + N_cp[sym_pos_in_slot]
@@ -75,9 +84,9 @@ def nrOFDMModulate(
         # print(f'symbol {sym_pos_in_slot}, pos {sample_pos_in_slot}, CP {N_cp[sym_pos_in_slot]}, pos = {len(waveform)}')
         full_slot_grid *= np.exp(-1j * 2 * np.pi * CarrierFrequency / SampleRate * sample_pos_in_slot)
         sample_pos_in_slot += Nfft
-        
+
         symbol_waveform = np.fft.ifft(np.fft.fftshift(full_slot_grid))
-        symbol_waveform_cp = np.append(symbol_waveform[-N_cp[sym_pos_in_slot]:], symbol_waveform)
+        symbol_waveform_cp = np.append(symbol_waveform[-N_cp[sym_pos_in_slot] :], symbol_waveform)
         waveform = np.append(waveform, symbol_waveform_cp)
         info["CyclicPrefixLengths"] = np.append(info["CyclicPrefixLengths"], N_cp[sym_pos_in_slot])
         info["SymbolLengths"] = np.append(info["SymbolLengths"], symbol_len)

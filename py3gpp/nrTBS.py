@@ -8,23 +8,102 @@ def nrTBS(mod, nlayers, nPRB, NREPerPRB, tcr, xOh=0, tbScaling=1):
 
     ### Pre-defined table ###
 
-    modulation_schemes = {
-        'pi/2-BPSK': 1,
-        'QPSK': 2,
-        '16QAM': 4,
-        '64QAM': 6,
-        '256QAM': 8,
-        '1024QAM': 10
-    }
+    modulation_schemes = {"pi/2-BPSK": 1, "QPSK": 2, "16QAM": 4, "64QAM": 6, "256QAM": 8, "1024QAM": 10}
 
     tbs_values = [
-        24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160,
-        168, 176, 184, 192, 208, 224, 240, 256, 272, 288, 304, 320, 336, 352, 368, 384,
-        408, 432, 456, 480, 504, 528, 552, 576, 608, 640, 672, 704, 736, 768, 808, 848,
-        888, 928, 984, 1032, 1064, 1128, 1160, 1192, 1224, 1256, 1288, 1320, 1352, 1416,
-        1480, 1544, 1608, 1672, 1736, 1800, 1864, 1928, 2024, 2088, 2152, 2216, 2280,
-        2408, 2472, 2536, 2600, 2664, 2728, 2792, 2856, 2976, 3104, 3240, 3368, 3496,
-        3624, 3752, 3824
+        24,
+        32,
+        40,
+        48,
+        56,
+        64,
+        72,
+        80,
+        88,
+        96,
+        104,
+        112,
+        120,
+        128,
+        136,
+        144,
+        152,
+        160,
+        168,
+        176,
+        184,
+        192,
+        208,
+        224,
+        240,
+        256,
+        272,
+        288,
+        304,
+        320,
+        336,
+        352,
+        368,
+        384,
+        408,
+        432,
+        456,
+        480,
+        504,
+        528,
+        552,
+        576,
+        608,
+        640,
+        672,
+        704,
+        736,
+        768,
+        808,
+        848,
+        888,
+        928,
+        984,
+        1032,
+        1064,
+        1128,
+        1160,
+        1192,
+        1224,
+        1256,
+        1288,
+        1320,
+        1352,
+        1416,
+        1480,
+        1544,
+        1608,
+        1672,
+        1736,
+        1800,
+        1864,
+        1928,
+        2024,
+        2088,
+        2152,
+        2216,
+        2280,
+        2408,
+        2472,
+        2536,
+        2600,
+        2664,
+        2728,
+        2792,
+        2856,
+        2976,
+        3104,
+        3240,
+        3368,
+        3496,
+        3624,
+        3752,
+        3824,
     ]
 
     ### Input check ###
@@ -51,8 +130,7 @@ def nrTBS(mod, nlayers, nPRB, NREPerPRB, tcr, xOh=0, tbScaling=1):
             raise ValueError("tbScaling must be a scalar in the range (0, 1]")
     elif isinstance(tbScaling, (list, tuple)) and len(tbScaling) == 2:
         if not (0 < tbScaling[0] <= 1) or not (0 < tbScaling[1] <= 1):
-            raise ValueError(
-                "Each element in tbScaling must be in the range (0, 1]")
+            raise ValueError("Each element in tbScaling must be in the range (0, 1]")
     else:
         raise ValueError("Invalid type or format for tbScaling")
 
@@ -63,15 +141,12 @@ def nrTBS(mod, nlayers, nPRB, NREPerPRB, tcr, xOh=0, tbScaling=1):
             raise ValueError("tcr must be a scalar between 0 and 1")
     elif isinstance(tcr, (list, tuple)):
         if len(tcr) != len(mod):
-            raise ValueError(
-                "The number of elements in 'tcr' must match the number of codewords")
+            raise ValueError("The number of elements in 'tcr' must match the number of codewords")
         for t in tcr:
             if not (0 <= t <= 1):
-                raise ValueError(
-                    "Each element in 'tcr' must be between 0 and 1")
+                raise ValueError("Each element in 'tcr' must be between 0 and 1")
     else:
-        raise ValueError(
-            "Invalid type for 'tcr'. It must be a scalar, list, or tuple")
+        raise ValueError("Invalid type for 'tcr'. It must be a scalar, list, or tuple")
 
     # mod
     if isinstance(mod, (str, list, tuple)):
@@ -83,11 +158,11 @@ def nrTBS(mod, nlayers, nPRB, NREPerPRB, tcr, xOh=0, tbScaling=1):
             else:
                 raise ValueError("Invalid modulation scheme(s) in the input")
         else:
-            raise ValueError(
-                "Input 'mod' must be a single valid modulation or a list/tuple of 2 valid modulations")
+            raise ValueError("Input 'mod' must be a single valid modulation or a list/tuple of 2 valid modulations")
     else:
         raise ValueError(
-            "Invalid type for 'mod'. It must be a single valid modulation or a list/tuple of 2 valid modulations")
+            "Invalid type for 'mod'. It must be a single valid modulation or a list/tuple of 2 valid modulations"
+        )
 
     ### Calculate N Info for each codeword ###
 
@@ -106,8 +181,7 @@ def nrTBS(mod, nlayers, nPRB, NREPerPRB, tcr, xOh=0, tbScaling=1):
             if n_info[i] <= 3824:
                 n = max(3, np.floor(abs(np.log2(n_info[i]) - 6)))
                 n_info_ = max(24, (2**n) * np.floor(abs(n_info[i] / (2**n))))
-                closest_tbs = min(filter(lambda tbs: tbs >= n_info_,
-                                         tbs_values), key=lambda tbs: abs(tbs - n_info_))
+                closest_tbs = min(filter(lambda tbs: tbs >= n_info_, tbs_values), key=lambda tbs: abs(tbs - n_info_))
                 n_info[i] = max(n_info_, closest_tbs)
             else:
                 n = np.floor(abs(np.log2(n_info[i] - 24) - 5))
@@ -120,8 +194,7 @@ def nrTBS(mod, nlayers, nPRB, NREPerPRB, tcr, xOh=0, tbScaling=1):
                         c = np.ceil(abs((n_info_ + 24) / (8424)))
                         n_info[i] = (8 * c * np.ceil(abs((n_info_ + 24) / (8 * c)))) - 24
                     else:
-                        n_info[i] = (
-                            8 * np.ceil(abs((n_info_ + 24) / 8))) - 24
+                        n_info[i] = (8 * np.ceil(abs((n_info_ + 24) / 8))) - 24
 
             tbs.append(int(n_info[i]))
 

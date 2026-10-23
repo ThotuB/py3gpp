@@ -1,5 +1,7 @@
 import numpy as np
+
 from py3gpp.nrBCHDecode import nrBCHDecode
+
 
 def test_nrBCHDecode():
     # 3627MHz, 30720 KSPS
@@ -36,5 +38,6 @@ def test_nrBCHDecode():
     assert np.all(trblk == trblk_matlab), "nrBCHDecode trblk mismatch"
     assert np.all(sfn4lsb == np.array([0, 1, 0, 0])), "nrBCHDecode sfn4lsb mismatch"
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test_nrBCHDecode()

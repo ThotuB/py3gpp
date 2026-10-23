@@ -1,14 +1,17 @@
+import itertools
+
 import matlab.engine
 import numpy as np
 import pytest
-import itertools
 
 from py3gpp.nrSymbolModulate import nrSymbolModulate
 
+
 def get_bin_symbols(bps, symbols):
     databits = np.array(list(range(symbols)))
-    databits = np.array([(x & (2**np.arange(bps)) != 0).astype(int) for x in databits])
+    databits = np.array([(x & (2 ** np.arange(bps)) != 0).astype(int) for x in databits])
     return np.concatenate(databits, axis=0)
+
 
 def run_nr_mapper(databits, modtype, eng):
     ref_data = eng.nrSymbolModulate(eng.transpose(eng.logical(databits)), modtype)
@@ -19,11 +22,13 @@ def run_nr_mapper(databits, modtype, eng):
 
     assert (ref_data == data).all()
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope="session")
 def eng():
     eng = matlab.engine.connect_matlab()
     yield eng
     eng.quit()
+
 
 @pytest.mark.parametrize("modtype", ["BPSK", "pi/2-BPSK", "QPSK", "16QAM", "64QAM", "256QAM"])
 def test_nr_pbch_matlab(modtype, eng):

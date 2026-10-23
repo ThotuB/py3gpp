@@ -1,10 +1,12 @@
-import matlab.engine
 import itertools
+
+import matlab.engine
 import numpy as np
 import pytest
 
 from py3gpp.nrPBCHDMRS import nrPBCHDMRS
 from py3gpp.nrPBCHDMRSIndices import nrPBCHDMRSIndices
+
 
 def run_nr_pbch_dmrs(ncellid, issb, eng):
     ref_data = eng.nrPBCHDMRS(matlab.double(ncellid), matlab.double(issb))
@@ -23,11 +25,13 @@ def run_nr_pbch_dmrs(ncellid, issb, eng):
     assert np.all(ref_data == data)
     assert np.all(ref_ind == indices)
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope="session")
 def eng():
     eng = matlab.engine.connect_matlab()
     yield eng
     eng.quit()
+
 
 @pytest.mark.parametrize("ncellid", [0, 500, 1007])
 @pytest.mark.parametrize("issb", list(range(8)))

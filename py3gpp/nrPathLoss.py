@@ -2,6 +2,7 @@
 # Ref: TR 38.901 Section 7.4.1
 
 import numpy as np
+
 from py3gpp.configs.nrPathLossConfig import nrPathLossConfig
 
 
@@ -9,34 +10,34 @@ def nrPathLoss(pathlossconf, freq, los, bs, ue):
 
     # Check the input types
     if not isinstance(freq, (int, float)):
-        raise TypeError('freq must be a positive numeric scalar')
+        raise TypeError("freq must be a positive numeric scalar")
 
     if not isinstance(los, (bool, int, np.ndarray)):
-        raise TypeError('los must be true, false, 1, 0, or a logical matrix')
+        raise TypeError("los must be true, false, 1, 0, or a logical matrix")
 
     if not isinstance(bs, np.ndarray) or not isinstance(ue, np.ndarray):
-        raise TypeError('bs and ue must be numeric matrices')
+        raise TypeError("bs and ue must be numeric matrices")
 
     # Path loss equation
-    if pathlossconf.Scenario == 'RMa':
+    if pathlossconf.Scenario == "RMa":
 
         if not isinstance(los, (bool, int)):
             # TODO multi bs-ue link
-            raise TypeError('multi bs-ue link not yet supported.')
+            raise TypeError("multi bs-ue link not yet supported.")
 
         else:
             c = 3e8  # Speed of light (m/s)
             dist_bp = 2 * np.pi * bs[2] * ue[2] * (freq / c)
-            dist_2d = np.sqrt((ue[0] - bs[0])**2 + (ue[1] - bs[1])**2)
-            dist_3d = np.sqrt((dist_2d)**2 + (bs[2] - ue[2])**2)
+            dist_2d = np.sqrt((ue[0] - bs[0]) ** 2 + (ue[1] - bs[1]) ** 2)
+            dist_3d = np.sqrt((dist_2d) ** 2 + (bs[2] - ue[2]) ** 2)
 
             pathloss_one = 0
             pathloss_two = 0
             shadowfading_one = 0
             shadowfading_two = 0
 
-            pathloss_one += 20 * np.log10(40 * np.pi * dist_3d * (freq/1e9) / 3)
-            pathloss_one += min((0.03 * (pathlossconf.BuildingHeight ** 1.72)), 10) * np.log10(dist_3d)
+            pathloss_one += 20 * np.log10(40 * np.pi * dist_3d * (freq / 1e9) / 3)
+            pathloss_one += min((0.03 * (pathlossconf.BuildingHeight**1.72)), 10) * np.log10(dist_3d)
             pathloss_one += -min((0.044 * (pathlossconf.BuildingHeight**1.72)), 14.77)
             pathloss_one += 0.002 * np.log10(pathlossconf.BuildingHeight) * dist_3d
 
@@ -46,7 +47,7 @@ def nrPathLoss(pathlossconf, freq, los, bs, ue):
                 shadowfading_los = shadowfading_one
 
             else:
-                pathloss_two += 10 * np.log10((10**(pathloss_one / 10)) * dist_bp)
+                pathloss_two += 10 * np.log10((10 ** (pathloss_one / 10)) * dist_bp)
                 pathloss_two += 40 * np.log10(dist_3d / dist_bp)
                 shadowfading_two = 6
                 pathloss_los = pathloss_two
@@ -63,9 +64,9 @@ def nrPathLoss(pathlossconf, freq, los, bs, ue):
                 pathloss_nlos_ += 161.04
                 pathloss_nlos_ += -(7.1 * np.log10(pathlossconf.StreetWidth))
                 pathloss_nlos_ += 7.5 * np.log10(pathlossconf.BuildingHeight)
-                pathloss_nlos_ += -(24.37 - (3.7 * (pathlossconf.BuildingHeight / bs[2])**2)) * np.log10(bs[2])
+                pathloss_nlos_ += -(24.37 - (3.7 * (pathlossconf.BuildingHeight / bs[2]) ** 2)) * np.log10(bs[2])
                 pathloss_nlos_ += (43.42 - (3.1 * np.log10(bs[2]))) * ((np.log10(dist_3d)) - 3)
-                pathloss_nlos_ += (20 * np.log10(freq/1e9)) - (3.2 * (np.log10(11.75 * ue[2])))**2 - 4.97
+                pathloss_nlos_ += (20 * np.log10(freq / 1e9)) - (3.2 * (np.log10(11.75 * ue[2]))) ** 2 - 4.97
 
                 shadowfading_nlos = 8
 
@@ -76,13 +77,11 @@ def nrPathLoss(pathlossconf, freq, los, bs, ue):
 
             else:
 
-                raise TypeError(
-                    'los for single bs-ue link must be true, false, 1, 0')
+                raise TypeError("los for single bs-ue link must be true, false, 1, 0")
 
     else:
 
-        raise TypeError(
-            'This path loss model is not yet supported.')
+        raise TypeError("This path loss model is not yet supported.")
 
     return pathloss, shadowfading
 

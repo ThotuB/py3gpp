@@ -1,6 +1,7 @@
-from py3gpp import nrPDSCHDMRSIndices, nrPDSCHConfig, nrCarrierConfig
+from py3gpp import nrCarrierConfig, nrPDSCHConfig, nrPDSCHDMRSIndices
+
 
 def test_issue_66():
-  cfg = nrPDSCHConfig()
-  carrier = nrCarrierConfig()
-  dmrsIndices = nrPDSCHDMRSIndices(carrier, cfg)
+    cfg = nrPDSCHConfig()
+    carrier = nrCarrierConfig()
+    dmrsIndices = nrPDSCHDMRSIndices(carrier, cfg)

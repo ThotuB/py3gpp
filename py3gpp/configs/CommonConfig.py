@@ -1,5 +1,4 @@
-
-class CommonConfig():
+class CommonConfig:
     def __init__(self):
         self._MappingType = "A"
         self._SymbolAllocation = [0, 14]

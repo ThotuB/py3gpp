@@ -1,11 +1,12 @@
-
 import numpy as np
-from py3gpp.nrSymbolModulate import nrSymbolModulate
+
 from py3gpp.nrPRBS import nrPRBS
+from py3gpp.nrSymbolModulate import nrSymbolModulate
+
 
 def nrPDSCH(cws, modulation, nlayers, nid, nrnti):
     if nlayers != 1:
-        raise NotImplementedError('not ready yet')
+        raise NotImplementedError("not ready yet")
     assert nlayers in list(range(1, 9))
 
     if nlayers > 4:

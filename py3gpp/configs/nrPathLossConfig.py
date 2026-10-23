@@ -1,8 +1,9 @@
 # Ref: https://www.mathworks.com/help/5g/ref/nrpathlossconfig.html
 
-class nrPathLossConfig():
+
+class nrPathLossConfig:
     def __init__(self):
-        self._Scenario = 'UMa'
+        self._Scenario = "UMa"
         self._BuildingHeight = 5
         self._StreetWidth = 20
         self._EnvironmentHeight = 1
@@ -14,8 +15,17 @@ class nrPathLossConfig():
 
     @Scenario.setter
     def Scenario(self, Scenario):
-        assert Scenario in ['UMa', 'UMi', 'RMa', 'InH', 'InF-SL', 'InF-DL', 'InF-SH', 'InF-DH',
-                            'InF-HH'], "The value must be in 'UMa', 'UMi', 'RMa', 'InH', 'InF-SL', 'InF-DL', 'InF-SH', 'InF-DH', or 'InF-HH'"
+        assert Scenario in [
+            "UMa",
+            "UMi",
+            "RMa",
+            "InH",
+            "InF-SL",
+            "InF-DL",
+            "InF-SH",
+            "InF-DH",
+            "InF-HH",
+        ], "The value must be in 'UMa', 'UMi', 'RMa', 'InH', 'InF-SL', 'InF-DL', 'InF-SH', 'InF-DH', or 'InF-HH'"
         self._Scenario = Scenario
 
     @property

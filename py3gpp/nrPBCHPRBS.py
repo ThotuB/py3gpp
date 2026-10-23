@@ -1,5 +1,6 @@
 from .helper import _calc_gold
 
+
 # v: scrambling sequence phase, 0..7
 # n: number of elements in output sequence
 def nrPBCHPRBS(ncellid, v, n):

@@ -1,6 +1,7 @@
+import numpy as np
 
 from .helper import _calc_m_seq
-import numpy as np
+
 
 # TS 38.211 Section 5.2.1
 def nrPRBS(c_init, length):
@@ -12,7 +13,7 @@ def nrPRBS(c_init, length):
     c_0[0] = 1
     c_1 = np.zeros(N)
     for i in range(N):
-        c_1[i] = (c_init>>i) & 1
+        c_1[i] = (c_init >> i) & 1
 
     Nc = 1600
     seq_len = length + Nc
@@ -21,4 +22,4 @@ def nrPRBS(c_init, length):
 
     gold_seq = (mseq_0 + mseq_1) % 2
     gold_seq = np.roll(gold_seq, -Nc)
-    return gold_seq[: length]
+    return gold_seq[:length]

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # 16QAM constellation:
 #                Q
 #  1011    1001  |   0001  0011

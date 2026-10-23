@@ -1,6 +1,8 @@
 import numpy as np
-from py3gpp.nrOFDMInfo import nrOFDMInfo
+
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
+from py3gpp.nrOFDMInfo import nrOFDMInfo
+
 
 # TODO: implement CyclicPrefixFraction
 def nrOFDMDemodulate(
@@ -28,12 +30,12 @@ def nrOFDMDemodulate(
         if initialNSlot == None:
             print("Error: initialNSlot is needed without carrierConfig!")
             return
-        carrier = nrCarrierConfig(1, NSizeGrid = nrb, NStartGrid = 0, SubcarrierSpacing = scs, NSlot = initialNSlot)
+        carrier = nrCarrierConfig(1, NSizeGrid=nrb, NStartGrid=0, SubcarrierSpacing=scs, NSlot=initialNSlot)
     else:
         nrb = carrier.NSizeGrid
         scs = carrier.SubcarrierSpacing
         initialNSlot = 0 if initialNSlot is None else initialNSlot
-        
+
     if Nfft == None:
         if SampleRate == None:
             Nfft = nrOFDMInfo(nrb=nrb, scs=scs)["Nfft"]
@@ -67,8 +69,8 @@ def nrOFDMDemodulate(
         symbol_t = waveform[idx:][:Nfft]
         symbol_f = np.fft.fftshift(np.fft.fft(symbol_t))
 
-        symbol_f *= np.exp(1j*2*np.pi*(N_cp[sym_pos_in_slot] - cp_advance)/Nfft*np.arange(len(symbol_f)))
-        symbol_f *= np.exp(1j*np.pi*(N_cp[sym_pos_in_slot] - cp_advance))
+        symbol_f *= np.exp(1j * 2 * np.pi * (N_cp[sym_pos_in_slot] - cp_advance) / Nfft * np.arange(len(symbol_f)))
+        symbol_f *= np.exp(1j * np.pi * (N_cp[sym_pos_in_slot] - cp_advance))
 
         symbol_f = symbol_f[Nfft // 2 - nrb * 12 // 2 : Nfft // 2 + nrb * 12 // 2]
 

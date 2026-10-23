@@ -1,6 +1,8 @@
 import numpy as np
-from py3gpp.nrPathLoss import nrPathLoss
+
 from py3gpp.configs.nrPathLossConfig import nrPathLossConfig
+from py3gpp.nrPathLoss import nrPathLoss
+
 
 def test_nrPathLoss():
     pathlossconf = nrPathLossConfig()
@@ -17,5 +19,6 @@ def test_nrPathLoss():
     assert np.round(pathloss, 4) == 110.1615
     assert shadowfading == 4
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test_nrPathLoss()

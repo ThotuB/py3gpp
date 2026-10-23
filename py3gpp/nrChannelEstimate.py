@@ -1,5 +1,6 @@
 import numpy as np
 import scipy
+
 from py3gpp import nrSetResources
 
 
@@ -43,7 +44,6 @@ def nrChannelEstimate(rxGrid=None, refInd=None, refSym=None, refGrid=None, carri
                 temp = H[row, :]
                 idx = np.where(temp != 0)[0]
                 H[row, :] = np.interp(np.arange(N), idx, temp[idx])
-
 
         # estimate noise variance
         mean = np.mean((np.abs(H[:, 1]), np.abs(H[:, 3])), axis=0)

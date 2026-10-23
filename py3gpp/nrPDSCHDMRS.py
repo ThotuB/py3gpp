@@ -1,22 +1,22 @@
-
 # 38.211
 
 import numpy as np
 
+from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
+from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
 from py3gpp.nrPRBS import nrPRBS
 from py3gpp.nrSymbolModulate import nrSymbolModulate
-from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
+
 
 def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig):
     if cfg.DMRS.DMRSConfigurationType == 1:
         n_dmrs_per_re = 6
     else:
         n_dmrs_per_re = 4
-    n_dmrs_bits_re = 2*n_dmrs_per_re
+    n_dmrs_bits_re = 2 * n_dmrs_per_re
 
     dmrs_begin = n_dmrs_bits_re * min(cfg.PRBSet)
-    dmrs_end = n_dmrs_bits_re * (max(cfg.PRBSet)+1)
+    dmrs_end = n_dmrs_bits_re * (max(cfg.PRBSet) + 1)
     dmrs_size = n_dmrs_bits_re * cfg.NSizeBWP
 
     n_scid = 0
@@ -34,6 +34,7 @@ def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig):
         dmrs_syms = np.append(dmrs_syms, nrSymbolModulate(dmrs_prbs, "QPSK"))
 
     return dmrs_syms
+
 
 # LUT for DMRS occupied symbols positions
 def PDSCHDMRSSyms(cfg: nrPDSCHConfig):
@@ -82,5 +83,6 @@ def PDSCHDMRSSyms(cfg: nrPDSCHConfig):
 
     return occupied_syms
 
+
 def PDSCHDMRScinit(sps, n_slot, n_symb, NIDSCID, n_scid):
-    return 2**17 * (sps * n_slot + n_symb + 1) * (2*NIDSCID + 1) + 2*NIDSCID + n_scid
+    return 2**17 * (sps * n_slot + n_symb + 1) * (2 * NIDSCID + 1) + 2 * NIDSCID + n_scid

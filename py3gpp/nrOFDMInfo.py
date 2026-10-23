@@ -1,4 +1,3 @@
-
 def nrOFDMInfo(carrier=None, nrb=None, scs=None):
     if nrb is None or scs is None:
         if carrier is None:

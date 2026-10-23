@@ -1,6 +1,7 @@
 import numpy as np
 
-def _calc_m_seq(N, c, taps, seq_len = None):
+
+def _calc_m_seq(N, c, taps, seq_len=None):
     if seq_len is None:
         seq_len = 2**N - 1
     m = np.zeros(seq_len, "int32")  # m-sequence
@@ -19,7 +20,7 @@ def _calc_gold(c_init, length):
     c_0[0] = 1
     c_1 = np.zeros(N)
     for i in range(N):
-        c_1[i] = (c_init>>i) & 1
+        c_1[i] = (c_init >> i) & 1
 
     Nc = 1600
     seq_len = length + Nc
@@ -28,7 +29,7 @@ def _calc_gold(c_init, length):
 
     gold_seq = (mseq_0 + mseq_1) % 2
     gold_seq = np.roll(gold_seq, -Nc)
-    return gold_seq[: length]
+    return gold_seq[:length]
 
 
 # fmt: off
@@ -78,6 +79,7 @@ frozen_pos_table = np.array([0, 1, 2, 4, 8, 16, 32, 3, 5, 64, 9, 6, 17, 10, 18, 
     1012, 999, 1016, 767, 989, 1003, 990, 1005, 959, 1011, 1013, 895, 1006, 1014, 1017, 1018, 991, 1020, 1007, 1015,
     1019, 1021, 1022, 1023], "int")
 # fmt: on
+
 
 # modified from sionna
 # https://github.com/NVlabs/sionna/blob/main/sionna/fec/polar/utils.py
@@ -150,6 +152,7 @@ def generate_5g_ranking(k, n, sort=True):
         frozen_pos = np.sort(frozen_pos)
 
     return [frozen_pos, info_pos]
+
 
 def polar_precode_interleave(K):
     # 38.212 Table 5.3.1.1-1

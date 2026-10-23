@@ -1,5 +1,6 @@
-from .PDSCHConfigBase import PDSCHConfigBase
 from .CommonConfig import CommonConfig
+from .PDSCHConfigBase import PDSCHConfigBase
+
 
 class nrPDSCHConfig(PDSCHConfigBase, CommonConfig):
     def __init__(self):

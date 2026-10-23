@@ -1,11 +1,12 @@
 import numpy as np
+
 from py3gpp.helper import _calc_m_seq
 
 
 def nrSSSm0(ncellid):
     n1 = ncellid // 3
     n2 = ncellid % 3
-    return 15*(n1 // 112) + 5*n2
+    return 15 * (n1 // 112) + 5 * n2
 
 
 def nrSSSm1(ncellid):
@@ -29,4 +30,3 @@ def _gold(ncellid):
 def nrSSS(ncellid):
     assert ncellid >= 0 and ncellid <= 1007, "invalid ncellid"
     return _gold(ncellid)
-

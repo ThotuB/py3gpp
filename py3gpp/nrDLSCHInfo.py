@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def nrDLSCHInfo(tbs, tcr):
     assert tbs >= 0
     assert type(tbs) == int
@@ -10,29 +11,29 @@ def nrDLSCHInfo(tbs, tcr):
 
     # Get number of bits (including filler bits) to be encoded by LDPC encoder
     if bg_info["BGN"] == 1:
-        N = 66*cb_info["Zc"]
+        N = 66 * cb_info["Zc"]
     else:
-        N = 50*cb_info["Zc"]
+        N = 50 * cb_info["Zc"]
 
     # Combine information into the output structure
     info = dict()
-    info["CRC"]      = bg_info["CRC"]  # CRC polynomial
-    info["L"]        = bg_info["L"]    # Number of CRC bits
-    info["BGN"]      = bg_info["BGN"]  # Base graph number
-    info["C"]        = cb_info["C"]    # Number of code block segments
-    info["Lcb"]      = cb_info["Lcb"]  # Number of parity bits per code block
-    info["F"]        = cb_info["F"]    # Number of <NULL> filler bits per code block
-    info["Zc"]       = cb_info["Zc"]   # Selected lifting size
-    info["K"]        = cb_info["K"]    # Number of bits per code block after CBS
-    info["N"]        = N              # Number of bits per code block after LDPC coding
+    info["CRC"] = bg_info["CRC"]  # CRC polynomial
+    info["L"] = bg_info["L"]  # Number of CRC bits
+    info["BGN"] = bg_info["BGN"]  # Base graph number
+    info["C"] = cb_info["C"]  # Number of code block segments
+    info["Lcb"] = cb_info["Lcb"]  # Number of parity bits per code block
+    info["F"] = cb_info["F"]  # Number of <NULL> filler bits per code block
+    info["Zc"] = cb_info["Zc"]  # Selected lifting size
+    info["K"] = cb_info["K"]  # Number of bits per code block after CBS
+    info["N"] = N  # Number of bits per code block after LDPC coding
 
     # Modify the output fields if tbs is empty or zero
     if tbs is None:
-        info["L"]  = 0
-        info["F"]  = 0
+        info["L"] = 0
+        info["F"] = 0
         info["Zc"] = 2
-        info["K"]  = 0
-        info["N"]  = 0
+        info["K"] = 0
+        info["N"] = 0
 
     return info
 
@@ -44,30 +45,34 @@ def getBGNInfo(A, R):
         bgn = 1
 
     if A > 3824:
-        L   = 24
-        crc = '24A'
+        L = 24
+        crc = "24A"
     else:
-        L   = 16
-        crc = '16'
+        L = 16
+        crc = "16"
 
     info = dict()
     info["BGN"] = bgn
-    info["B"]   = A + L
-    info["L"]   = L
+    info["B"] = A + L
+    info["L"] = L
     info["CRC"] = crc
 
     return info
 
+
 def getZarray():
-    Zarray = [[2, 4, 8, 16, 32, 64, 128, 256],
-            [3, 6, 12, 24, 48, 96, 192, 384],
-            [5, 10, 20, 40, 80, 160, 320],
-            [7, 14, 28, 56, 112, 224],
-            [9, 18, 36, 72, 144, 288],
-            [11, 22, 44, 88, 176, 352],
-            [13, 26, 52, 104, 208],
-            [15, 30, 60, 120, 240]]
+    Zarray = [
+        [2, 4, 8, 16, 32, 64, 128, 256],
+        [3, 6, 12, 24, 48, 96, 192, 384],
+        [5, 10, 20, 40, 80, 160, 320],
+        [7, 14, 28, 56, 112, 224],
+        [9, 18, 36, 72, 144, 288],
+        [11, 22, 44, 88, 176, 352],
+        [13, 26, 52, 104, 208],
+        [15, 30, 60, 120, 240],
+    ]
     return Zarray
+
 
 def getZlist():
     # Zlist = [2:16 18:2:32 36:4:64 72:8:128 144:16:256 288:32:384];
@@ -79,6 +84,7 @@ def getZlist():
     Zlist += list(range(144, 257, 16))
     Zlist += list(range(288, 385, 32))
     return np.array(Zlist).astype(int)
+
 
 def getCBSInfo(B, bgn):
     if bgn == 1:
@@ -92,15 +98,15 @@ def getCBSInfo(B, bgn):
         C = 1
         Bd = B
     else:
-        L = 24 # Length of the CRC bits attached to each code block
-        C = np.ceil(B/(Kcb-L)).astype(int)
-        Bd = B+C*L
+        L = 24  # Length of the CRC bits attached to each code block
+        C = np.ceil(B / (Kcb - L)).astype(int)
+        Bd = B + C * L
 
     # Obtain the number of bits per code block (excluding CB-CRC bits)
-    cbz = np.ceil(B/C).astype(int)
+    cbz = np.ceil(B / C).astype(int)
 
     # Get number of bits in each code block (excluding filler bits)
-    Kd = np.ceil(Bd/C).astype(int)
+    Kd = np.ceil(Bd / C).astype(int)
 
     # Find the minimum value of Z in all sets of lifting sizes in 38.212
     # Table 5.3.2-1, denoted as Zc, such that Kb*Zc>=Kd
@@ -125,21 +131,21 @@ def getCBSInfo(B, bgn):
     #     if Kb*x >= Kd:
     #         Zc.append(x)
     # Zc = min(Zc)
-    Zc = min([x for x in Zlist if (Kb*x >= Kd)])
+    Zc = min([x for x in Zlist if (Kb * x >= Kd)])
 
     # Get number of bits (including <NULL> filler bits) to be input to the LDPC encoder
     if bgn == 1:
-        K = 22*Zc
+        K = 22 * Zc
     else:
-        K = 10*Zc
+        K = 10 * Zc
 
     info = dict()
-    info["C"]   = C     # Number of code block segments
-    info["CBZ"] = cbz   # Number of bits in each code block (excluding CB-CRC bits and filler bits)
-    info["Lcb"] = L     # Number of parity bits in each code block
-    info["F"]   = K-Kd  # Number of filler bits in each code block
-    info["K"]   = K     # Number of bits in each code block (including CB-CRC bits and filler bits)
-    info["Zc"]  = Zc    # Selected lifting size
-    info["Z"]   = Zlist # Full lifting size set
+    info["C"] = C  # Number of code block segments
+    info["CBZ"] = cbz  # Number of bits in each code block (excluding CB-CRC bits and filler bits)
+    info["Lcb"] = L  # Number of parity bits in each code block
+    info["F"] = K - Kd  # Number of filler bits in each code block
+    info["K"] = K  # Number of bits in each code block (including CB-CRC bits and filler bits)
+    info["Zc"] = Zc  # Selected lifting size
+    info["Z"] = Zlist  # Full lifting size set
 
     return info

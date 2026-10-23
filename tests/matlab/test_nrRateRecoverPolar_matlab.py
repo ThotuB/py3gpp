@@ -1,9 +1,11 @@
-import matlab.engine
 import itertools
+
+import matlab.engine
 import numpy as np
 import pytest
 
 from py3gpp.nrRateRecoverPolar import nrRateRecoverPolar
+
 
 def run_nrRateRecoverPolar(N, eng):
     K = 56
@@ -15,17 +17,20 @@ def run_nrRateRecoverPolar(N, eng):
 
     assert (ref_data == data).all()
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope="session")
 def eng():
     eng = matlab.engine.connect_matlab()
     yield eng
     eng.quit()
 
+
 @pytest.mark.parametrize("N", [512, 256, 128])
 def test_nrRateRecoverPolar_matlab(N, eng):
     run_nrRateRecoverPolar(N, eng)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     _eng = matlab.engine.connect_matlab()
     test_nrRateRecoverPolar(512, _eng)
     _eng.quit()

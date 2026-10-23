@@ -3,7 +3,7 @@ import numpy as np
 
 def nrCRCEncode(blk, poly, mask=0):
     if len(blk.shape) == 1:
-        blk = np.expand_dims(blk, axis = 1)
+        blk = np.expand_dims(blk, axis=1)
     if poly == "6":
         L = 6
         # fmt: off

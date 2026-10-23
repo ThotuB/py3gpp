@@ -1,9 +1,11 @@
-import matlab.engine
 import itertools
+
+import matlab.engine
 import numpy as np
 import pytest
 
 from py3gpp.nrCRCEncode import nrCRCEncode
+
 
 def run_nr_crc_encode(poly, blk_size, eng):
     blk_bits = eng.randi(matlab.double([0, 1]), blk_size, 1)
@@ -16,7 +18,8 @@ def run_nr_crc_encode(poly, blk_size, eng):
 
     assert np.array_equal(ref_data, data)
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope="session")
 def eng():
     eng = matlab.engine.connect_matlab()
     yield eng
@@ -28,7 +31,8 @@ def eng():
 def test_nr_crc_encode_matlab(poly, blk_size, eng):
     run_nr_crc_encode(poly, blk_size, eng)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     _eng = matlab.engine.connect_matlab()
     test_nr_crc_encode("6", 100, _eng)
     _eng.quit()

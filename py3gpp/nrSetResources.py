@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # this function does not exist in Matlab, but its useful in python because
 # numpy does not support integer indexing across dimensions
 def nrSetResources(ind, grid, vals):

@@ -1,10 +1,12 @@
-import matlab.engine
 import itertools
+
+import matlab.engine
 import numpy as np
 import pytest
 
 from py3gpp.nrSSS import nrSSS
 from py3gpp.nrSSSIndices import nrSSSIndices
+
 
 def run_nr_sss(ncellid, eng):
     ref_data = eng.nrSSS(matlab.double(ncellid))
@@ -20,13 +22,14 @@ def run_nr_sss(ncellid, eng):
     assert (ref_data == data).all()
     assert (indices == ref_ind).all()
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope="session")
 def eng():
     eng = matlab.engine.connect_matlab()
     yield eng
     eng.quit()
 
+
 @pytest.mark.parametrize("ncellid", [0, 600, 1007])
 def test_nr_sss_matlab(ncellid, eng):
     run_nr_sss(ncellid, eng)
-

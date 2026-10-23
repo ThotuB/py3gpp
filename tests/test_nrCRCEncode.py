@@ -1,5 +1,7 @@
 import numpy as np
+
 from py3gpp.nrCRCEncode import nrCRCEncode
+
 
 def test_nrCRCEncode():
     test = np.zeros(32)
@@ -9,5 +11,6 @@ def test_nrCRCEncode():
     assert np.all(result[:, 0] == [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0])
     # fmt: on
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test_nrCRCEncode()
