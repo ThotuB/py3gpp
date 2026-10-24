@@ -262,7 +262,7 @@ def qm_to_mod(qm: int) -> Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]:
 
 class qam64_table:
     def __init__(self) -> None:
-        self._table: NDArray[np.int_] = np.zeros((4, 29), int)
+        self._table: NDArray[np.float64] = np.zeros((4, 29), dtype=float)
         self._table[0, :] = np.arange(self._table.shape[1])
         self._table[1, :] = np.array(
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
@@ -335,7 +335,7 @@ class qam64_table:
         )
 
     def Qm(self, mcs: int) -> int:
-        return self._table[1, mcs]
+        return int(self._table[1, mcs])
 
     def Modulation(self, mcs: int) -> Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]:
         return qm_to_mod(self._table[1, mcs])
@@ -349,7 +349,7 @@ class qam64_table:
 
 class qam64lowse_table:
     def __init__(self) -> None:
-        self._table: NDArray[np.int_] = np.zeros((4, 29), int)
+        self._table: NDArray[np.float64] = np.zeros((4, 29), dtype=float)
         self._table[0, :] = np.arange(self._table.shape[1])
         self._table[1, :] = np.array(
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6]
@@ -422,7 +422,7 @@ class qam64lowse_table:
         )
 
     def Qm(self, mcs: int) -> int:
-        return self._table[1, mcs]
+        return int(self._table[1, mcs])
 
     def Modulation(self, mcs: int) -> Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]:
         return qm_to_mod(self._table[1, mcs])
@@ -436,7 +436,7 @@ class qam64lowse_table:
 
 class qam256_table:
     def __init__(self) -> None:
-        self._table: NDArray[np.int_] = np.zeros((4, 28), int)
+        self._table: NDArray[np.float64] = np.zeros((4, 28), dtype=float)
         self._table[0, :] = np.arange(self._table.shape[1])
         self._table[1, :] = np.array(
             [2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 8, 8]
@@ -507,7 +507,7 @@ class qam256_table:
         )
 
     def Qm(self, mcs: int) -> int:
-        return self._table[1, mcs]
+        return int(self._table[1, mcs])
 
     def Modulation(self, mcs: int) -> Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]:
         return qm_to_mod(self._table[1, mcs])
