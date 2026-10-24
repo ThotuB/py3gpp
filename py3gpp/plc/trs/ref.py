@@ -141,9 +141,11 @@ def nrTBS(
     if isinstance(tbScaling, (int, float)):
         if not (0 < tbScaling <= 1):
             raise ValueError("tbScaling must be a scalar in the range (0, 1]")
+        tbScaling = [tbScaling, tbScaling]
     elif isinstance(tbScaling, (list, tuple)) and len(tbScaling) == 2:
         if not (0 < tbScaling[0] <= 1) or not (0 < tbScaling[1] <= 1):
             raise ValueError("Each element in tbScaling must be in the range (0, 1]")
+        tbScaling = list(tbScaling)
     else:
         raise ValueError("Invalid type or format for tbScaling")
 
@@ -182,7 +184,7 @@ def nrTBS(
     n_info = []
     for i in range(len(mod)):
         n_re = min(156, (NREPerPRB - xOh)) * (nPRB // len(mod))  # Divide nPRB into equal parts
-        n_info.append(tbScaling * n_re * tcr[i] * bits_per_symbol[i] * nlayers)
+        n_info.append(tbScaling[i] * n_re * tcr[i] * bits_per_symbol[i] * nlayers)
 
     tbs = []
     for i in range(len(n_info)):
@@ -527,11 +529,3 @@ class pdsch_mcs_table_class:
 def nrPDSCHMCSTables() -> pdsch_mcs_table_class:
     """PDSCH MCS mapping tables."""
     return pdsch_mcs_table_class()
-
-
-if __name__ == "__main__":
-    table = nrPDSCHMCSTables().QAM64Table
-    mcs = 0
-    print(f"mcs = {mcs}, modulation = {table.Modulation(mcs)}, rate = {table.Rate(mcs)}")
-    mcs = 16
-    print(f"mcs = {mcs}, modulation = {table.Modulation(mcs)}, rate = {table.Rate(mcs)}")

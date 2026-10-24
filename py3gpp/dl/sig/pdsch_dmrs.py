@@ -119,6 +119,8 @@ def nrPDSCHDMRSIndices(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> NDArray[
     elif cfg.DMRS.DMRSConfigurationType == 2:
         # Takes every 4th couple of symbols
         occupied_res = dmrs_full_range.reshape(-1, 2)[::3].ravel()
+    else:
+        raise AssertionError(f"unreachable: unsupported DMRSConfigurationType {cfg.DMRS.DMRSConfigurationType}")
 
     # Calculates occupied symbols numbers. Time positions
     occupied_syms = PDSCHDMRSSyms(cfg)

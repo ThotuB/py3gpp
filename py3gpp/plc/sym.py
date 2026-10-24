@@ -34,7 +34,7 @@ def nrPRBS(c_init: int, length: int) -> NDArray[np.int32]:
 
 
 # 38.211 5.1 Modulation mapper
-def nrSymbolModulate(databits: NDArray[np.int_], modulation: str) -> NDArray[np.complex128]:
+def nrSymbolModulate(databits: NDArray[np.integer], modulation: str) -> NDArray[np.complex128]:
     """Generate modulated symbols."""
     int_modtype = modulation.lower()
 
@@ -95,6 +95,8 @@ def nrSymbolModulate(databits: NDArray[np.int_], modulation: str) -> NDArray[np.
                 (1 - 2 * sample[1]) * (8 - (1 - 2 * sample[3]) * (4 - (1 - 2 * sample[5]) * (2 - (1 - 2 * sample[7]))))
             )
         res_arr = [x / np.sqrt(170) for x in res_arr]
+    else:
+        raise AssertionError(f"unreachable: unsupported modulation type {int_modtype}")
 
     return np.array(res_arr)
 
@@ -258,6 +260,8 @@ def nrLayerMap(
                 raise ValueError("in_symbols value does not match between codewords 1 and 2")
         else:
             raise ValueError("nLayers must be an integer between 5 to 8 for 2 codewords.")
+    else:
+        raise AssertionError(f"unreachable: unsupported number of codewords {codewords}")
     return out
 
 

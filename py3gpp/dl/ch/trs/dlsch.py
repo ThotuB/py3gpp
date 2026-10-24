@@ -8,11 +8,12 @@ from numpy.typing import NDArray
 
 def nrDLSCHInfo(tbs: int | None, tcr: float) -> dict[str, Any]:
     """Get downlink shared channel (DL-SCH) information."""
-    assert tbs >= 0
-    assert type(tbs) == int
+    assert tbs is None or tbs >= 0
+    assert tbs is None or type(tbs) == int
     assert tcr > 0 and tcr < 1
 
-    bg_info = getBGNInfo(tbs, tcr)
+    # an empty/None tbs is treated as A = 0 for BGN/CRC/code-block purposes (see override below)
+    bg_info = getBGNInfo(0 if tbs is None else tbs, tcr)
     cb_info = getCBSInfo(bg_info["B"], bg_info["BGN"])
 
     # Get number of bits (including filler bits) to be encoded by LDPC encoder

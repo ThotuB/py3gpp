@@ -37,21 +37,18 @@ def nrCodeBlockSegmentLDPC(blk: NDArray[np.int_], bgn: Literal[1, 2]) -> NDArray
             if cbsInfo["Lcb"] == 0:
                 cbs[0 : len(blk) - idx, i] = blk[idx:, 0]
             elif cbsInfo["Lcb"] == 24:
-                blk_padded = np.zeros(cbsInfo["CBZ"])
+                blk_padded = np.zeros(cbsInfo["CBZ"], dtype=int)
                 blk_padded[: len(blk) - idx] = blk[idx:, 0]
                 cbs[0 : cbsInfo["CBZ"] + cbsInfo["Lcb"], i] = nrCRCEncode(blk_padded, "24B", 0)[:, 0]
 
     return cbs
 
 
-def nrCodeBlockDesegmentLDPC(
-    cbs: NDArray[np.int_], bgn: Literal[1, 2], blklen: int
-) -> tuple[NDArray[np.floating], bool]:
+def nrCodeBlockDesegmentLDPC(cbs: NDArray[np.int_], bgn: Literal[1, 2], blklen: int) -> tuple[NDArray[np.int_], bool]:
     """Code block desegmentation and CRC decoding."""
     assert len(cbs.shape) == 2
-    blk = None
     err = False
-    blk = np.zeros(blklen)
+    blk = np.zeros(blklen, dtype=int)
     if cbs.shape[1] == 1:
         blk = cbs[:blklen, 0]
         # there is no appended CRC when there is only one segment
@@ -376,7 +373,7 @@ def nrLDPCEncode(
                 if x < min_val:
                     min_val = x
                     i_ls = i
-    assert i is not None, "could not find i_ls"
+    assert i_ls is not None, "could not find i_ls"
     # print(f'K = {K}, bgn = {bgn} => Zc = {Zc}, k_b = {k_b}, N = {N}, R = {K / N}, i_ls = {i_ls}')
 
     # replace filler bits with 0
@@ -420,25 +417,6 @@ def _check_cw(B: NDArray[np.float64], Zc: int, cw: NDArray[np.floating]) -> bool
         for j in range(N):
             syn[i * Zc :][:Zc] = np.mod(syn[i * Zc :][:Zc] + _mul_sh(cw[j * Zc :][:Zc], B[i, j]), 2)
     return not np.any(syn)
-
-
-if __name__ == "__main__":
-    bgn = 2
-    C = 2
-    K = 2560
-    F = 36
-
-    cbs = np.ones((K - F, C))
-    cbs[0:10] = 0
-    fillers = (-1) * np.ones((F, C))
-    cbs = np.vstack((cbs, fillers))
-    codedcbs_1 = nrLDPCEncode(cbs.copy(), bgn, algo="sionna")
-
-    codedcbs_2 = nrLDPCEncode(cbs, bgn, algo="thangaraj")
-
-    assert codedcbs_1.shape == (12800, 2)
-    assert codedcbs_2.shape == (12800, 2)
-    assert np.array_equal(codedcbs_1, codedcbs_2)
 
 
 def nrLDPCDecode(
@@ -505,7 +483,7 @@ def nrLDPCDecode(
                 if x < min_val:
                     min_val = x
                     i_ls = i
-    assert i is not None, "could not find i_ls"
+    assert i_ls is not None, "could not find i_ls"
     if verbose:
         print(
             f"block length B = {in_.shape[0]}, number of information bits K = {K}, code rate R = {rate}, i_ls = {i_ls}"
@@ -524,6 +502,7 @@ def nrLDPCDecode(
     elif Algorithm == "Offset min-sum":
         algo = 2
 
+    itr = 0
     for c_idx in range(C):
         if verbose:
             print(f"decoding segment {c_idx} ...")
@@ -594,44 +573,6 @@ def nrLDPCDecode(
     return rxcbs, actualniters
 
 
-if __name__ == "__main__":
-    bgn = 2
-    C = 2
-    K = 2560
-    F = 36
-    # cbs = np.ones((K - F, C))
-    cbs = np.random.randint(2, size=(K - F, C))
-    fillers = (-1) * np.ones((F, C))
-    txcbs = np.vstack((cbs, fillers))
-    txcodedcbs = nrLDPCEncode(txcbs, bgn)
-
-    # replace filler bits with 0
-    fill_indices = txcodedcbs[:, 0] == -1
-
-    # convert to rx soft bits
-    rxcodedcbs = 1 - 2 * txcodedcbs.astype(np.double)
-
-    rxcodedcbs[fill_indices, :] = 0
-
-    import time
-
-    import matlab.engine
-
-    _eng = matlab.engine.connect_matlab()
-    st = time.time()
-    rxcbs2 = _eng.nrLDPCDecode(rxcodedcbs, bgn, 10, "Termination", "max", "Algorithm", "Layered belief propagation")
-    et = time.time()
-    _eng.quit()
-    print(f"decoding with matlab took {et - st} s")
-
-    st = time.time()
-    [rxcbs, actualniters] = nrLDPCDecode(rxcodedcbs, bgn, 10, Algorithm="Normalized min-sum", vectorize=True)
-    et = time.time()
-    txcbs[-F:] = 0
-    print(f"decoding with python took {et - st} s")
-    assert np.array_equal(rxcbs, txcbs)
-
-
 def nrRateMatchLDPC(
     in_: NDArray[np.int_], outlen: int, rv: Literal[0, 1, 2, 3], mod: Modulation, nLayers: Literal[1, 2, 3, 4]
 ) -> NDArray[np.int_]:
@@ -672,16 +613,16 @@ def nrRateMatchLDPC(
             k0 = np.floor(17 * Ncb / N) * Zc
         elif rv == 2:
             k0 = np.floor(33 * Ncb / N) * Zc
-        elif rv == 3:
+        else:
             k0 = np.floor(56 * Ncb / N) * Zc
-    elif bgn == 2:
+    else:
         if rv == 0:
             k0 = 0
         elif rv == 1:
             k0 = np.floor(13 * Ncb / N) * Zc
         elif rv == 2:
             k0 = np.floor(25 * Ncb / N) * Zc
-        elif rv == 3:
+        else:
             k0 = np.floor(43 * Ncb / N) * Zc
     k0 = int(k0)
     rematched = np.empty(0, int)
@@ -710,16 +651,6 @@ def _rateMatch(d: NDArray[np.int_], E: int, k0: int, Ncb: int, Qm: int) -> NDArr
     # according to section 5.4.2.2
     e = np.reshape(e, (Qm, int(E / Qm), -1)).ravel(order="F")
     return e
-
-
-if __name__ == "__main__":
-    rv = 0
-    mod = "QPSK"
-    nLayers = 1
-    outlen = 8000
-    in_ = np.ones((3960, 2))
-    rematched = nrRateMatchLDPC(in_, outlen, rv, mod, nLayers)
-    assert rematched.shape == (8000,)
 
 
 def nrRateRecoverLDPC(
@@ -763,16 +694,16 @@ def nrRateRecoverLDPC(
             k0 = np.floor(17 * Ncb / N) * Zc
         elif rv == 2:
             k0 = np.floor(33 * Ncb / N) * Zc
-        elif rv == 3:
+        else:
             k0 = np.floor(56 * Ncb / N) * Zc
-    elif bgn == 2:
+    else:
         if rv == 0:
             k0 = 0
         elif rv == 1:
             k0 = np.floor(13 * Ncb / N) * Zc
         elif rv == 2:
             k0 = np.floor(25 * Ncb / N) * Zc
-        elif rv == 3:
+        else:
             k0 = np.floor(43 * Ncb / N) * Zc
     k0 = int(k0)
 
@@ -831,15 +762,3 @@ def _rateRecover(
         out[indices] = in_
 
     return out
-
-
-if __name__ == "__main__":
-    sbits = np.ones(4500)
-    trblklen = 4000
-    R = 0.5
-    rv = 1
-    mod = "QPSK"
-    nLayers = 1
-    numCB = 1
-    raterec = nrRateRecoverLDPC(sbits, trblklen, R, rv, mod, nLayers, numCB)
-    print(raterec.shape)

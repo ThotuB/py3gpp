@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
@@ -364,7 +364,7 @@ class nrPDSCHConfig(PDSCHConfigBase, CommonConfig):
 
 
 def nrPDSCH(
-    cws: list[NDArray[np.int_]], modulation: list[str], nlayers: int, nid: int, nrnti: int
+    cws: Sequence[NDArray[np.int_]], modulation: Sequence[str], nlayers: int, nid: int, nrnti: int
 ) -> NDArray[np.complex128]:
     """Generate PDSCH modulation symbols."""
     if nlayers != 1:
@@ -376,16 +376,14 @@ def nrPDSCH(
     else:
         ncw = 1
 
-    scrambled_bits = []
     res_sym = []
     for i in range(ncw):
         databits = cws[i]
         cinit = (nrnti * 2**15) + (i * 2**14) + nid
         prbs_bits = nrPRBS(cinit, len(databits))
-        scrambled_bits.append(np.bitwise_xor(databits, prbs_bits))
-        scrambled_bits = np.array(scrambled_bits)
+        scrambled_bits = np.bitwise_xor(databits, prbs_bits)
 
-        res_sym.append(nrSymbolModulate(scrambled_bits[i], modulation[i]))
+        res_sym.append(nrSymbolModulate(scrambled_bits, modulation[i]))
 
     # TODO
     # res_sym = nrLayerMap(res_sym, nlayers)
@@ -394,20 +392,21 @@ def nrPDSCH(
     return np.array(res_sym)
 
 
-def nrPDSCHDecode(sym: NDArray[np.complex128], mod: list[str], nid: int, rnti: int) -> NDArray[np.float64]:
+def nrPDSCHDecode(
+    sym: NDArray[np.complex128], mod: list[Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]], nid: int, rnti: int
+) -> NDArray[np.float64]:
     """Decode PDSCH modulation symbols."""
-    descrambled_bits = []
     n_layers = sym.shape[0]
     if n_layers != 1:
         raise NotImplementedError("not ready yet")
 
+    descrambled_bits = []
     for i in range(n_layers):
         demod_sym = nrSymbolDemodulate(sym[i], mod[i])
         cinit = (rnti * 2**15) + (i * 2**14) + nid
         prbs_bits = nrPRBS(cinit, len(demod_sym))
         descrambled_bits.append(np.multiply(demod_sym, (-prbs_bits * 2 + 1)))
-        descrambled_bits = np.array(descrambled_bits)
-    return descrambled_bits
+    return np.array(descrambled_bits)
 
 
 def nrPDSCHIndices(carrier: nrCarrierConfig, pdsch: nrPDSCHConfig) -> NDArray[np.int_]:
@@ -423,25 +422,3 @@ def nrPDSCHIndices(carrier: nrCarrierConfig, pdsch: nrPDSCHConfig) -> NDArray[np
         indices[i, :] += carrier.NSizeGrid * pdsch.NRBSize * i + NStartBWP * pdsch.NRBSize
     indices = np.delete(indices, PDSCHDMRSSyms(pdsch), axis=0)
     return indices.ravel()
-
-
-if __name__ == "__main__":
-    modulation = ["16QAM"]
-    nlayers = 1
-    ncellid = 42
-    rnti = 6143
-    data = np.random.randint(0, 2, size=(1, 8000))
-
-    txsym = nrPDSCH(data, modulation, nlayers, ncellid, rnti)
-    rxbits = nrPDSCHDecode(txsym, modulation, ncellid, rnti)
-    assert np.array_equal(data, np.round(rxbits < 0).astype(int))
-
-    pdsch_cfg = nrPDSCHConfig()
-    carrier_cfg = nrCarrierConfig()
-    carrier_cfg.NSizeGrid = 52
-    pdsch_cfg.NSizeBWP = 25
-    pdsch_cfg.NStartBWP = 10
-    pdsch_cfg.PRBSet = np.arange(pdsch_cfg.NSizeBWP)
-    indices = nrPDSCHIndices(carrier_cfg, pdsch_cfg)
-    print(indices.shape)
-    print(indices)

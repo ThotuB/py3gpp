@@ -8,12 +8,13 @@ def _calc_m_seq(
     N: int, c: NDArray[np.floating] | list[int], taps: list[int], seq_len: int | None = None
 ) -> NDArray[np.int32]:
     if seq_len is None:
-        seq_len = 2**N - 1
+        seq_len = int(2**N - 1)
     m = np.zeros(seq_len, "int32")  # m-sequence
     assert len(c) == N, "c has wrong length"
     m[:N] = c
+    taps_arr = np.asarray(taps)
     for i in np.arange(0, seq_len - N):
-        m[i + N] = np.sum(np.take(m, i + taps)) % 2
+        m[i + N] = np.sum(np.take(m, i + taps_arr)) % 2
     return m
 
 

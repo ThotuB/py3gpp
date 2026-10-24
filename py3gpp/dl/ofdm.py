@@ -40,7 +40,7 @@ class nrCarrierConfig(nrNumerologyConfig):
         NStartGrid: int = 0,
         NSlot: int = 0,
         NFrame: int = 0,
-        SubcarrierSpacing: int = 15,
+        SubcarrierSpacing: Literal[15, 30, 60, 120, 240] = 15,
     ) -> None:
         super().__init__()
         self._NCellID = NCellID
@@ -112,7 +112,7 @@ class nrCarrierConfig(nrNumerologyConfig):
 
 
 def nrOFDMInfo(
-    carrier: nrCarrierConfig | None = None, nrb: int | None = None, scs: int | None = None
+    carrier: nrCarrierConfig | None = None, nrb: int | None = None, scs: Literal[15, 30, 60, 120, 240] | None = None
 ) -> dict[str, int] | None:
     """Get OFDM information."""
     if nrb is None or scs is None:
@@ -126,6 +126,8 @@ def nrOFDMInfo(
         if 2 ** (i) * 0.85 >= nrb * 12:
             Nfft = 2**i
             break
+    else:
+        raise ValueError(f"nrb={nrb} is too large, no suitable FFT size found")
     info = dict()
     info["Nfft"] = Nfft
     return info
@@ -135,7 +137,7 @@ def nrOFDMInfo(
 def nrOFDMModulate(
     carrier: nrCarrierConfig | None = None,
     grid: NDArray[np.complexfloating] | None = None,
-    scs: int | None = None,
+    scs: Literal[15, 30, 60, 120, 240] | None = None,
     initialNSlot: int | None = None,
     CyclicPrefix: Literal["normal", "extended"] = "normal",
     Nfft: int | None = None,
@@ -146,10 +148,11 @@ def nrOFDMModulate(
     """Generate OFDM modulated waveform."""
     info = {}
 
+    if grid is None:
+        print("Error: grid is needed!")
+        return
+
     if carrier is None:
-        if grid is None:
-            print("Error: grid is needed when no carrierConfig is specified!")
-            return
         NSizeGrid = grid.shape[0] // 12
         carrier = nrCarrierConfig(NSizeGrid=NSizeGrid)
         if initialNSlot is None:
@@ -167,10 +170,14 @@ def nrOFDMModulate(
 
     if Nfft is None:
         if SampleRate is None:
-            Nfft = nrOFDMInfo(nrb=NSizeGrid, scs=scs)["Nfft"]
+            ofdm_info = nrOFDMInfo(nrb=NSizeGrid, scs=scs)
+            assert ofdm_info is not None
+            Nfft = ofdm_info["Nfft"]
             SampleRate = int(Nfft * scs * 1000)
         else:
             Nfft = int(SampleRate // scs // 1000)
+    elif SampleRate is None:
+        SampleRate = int(Nfft * scs * 1000)
 
     mu = (scs // 15) - 1
 
@@ -227,7 +234,7 @@ def nrOFDMDemodulate(
     carrier: nrCarrierConfig | None = None,
     waveform: NDArray[np.complexfloating] | None = None,
     nrb: int | None = None,
-    scs: int | None = None,
+    scs: Literal[15, 30, 60, 120, 240] | None = None,
     initialNSlot: int | None = None,
     CyclicPrefix: Literal["normal", "extended"] = "normal",
     Nfft: int | None = None,
@@ -240,13 +247,13 @@ def nrOFDMDemodulate(
         print("Error: no waveform given!")
         return
     if carrier is None:
-        if nrb == None:
+        if nrb is None:
             print("Error: nrb is needed without carrierConfig!")
             return
-        if scs == None:
+        if scs is None:
             print("Error: scs is needed without carrierConfig!")
             return
-        if initialNSlot == None:
+        if initialNSlot is None:
             print("Error: initialNSlot is needed without carrierConfig!")
             return
         carrier = nrCarrierConfig(1, NSizeGrid=nrb, NStartGrid=0, SubcarrierSpacing=scs, NSlot=initialNSlot)
@@ -255,12 +262,16 @@ def nrOFDMDemodulate(
         scs = carrier.SubcarrierSpacing
         initialNSlot = 0 if initialNSlot is None else initialNSlot
 
-    if Nfft == None:
-        if SampleRate == None:
-            Nfft = nrOFDMInfo(nrb=nrb, scs=scs)["Nfft"]
+    if Nfft is None:
+        if SampleRate is None:
+            ofdm_info = nrOFDMInfo(nrb=nrb, scs=scs)
+            assert ofdm_info is not None
+            Nfft = ofdm_info["Nfft"]
             SampleRate = int(Nfft * scs * 1000)
         else:
             Nfft = int(SampleRate // scs // 1000)
+    elif SampleRate is None:
+        SampleRate = int(Nfft * scs * 1000)
     mu = (scs // 15) - 1
     if CyclicPrefix == "normal":
         N_cp1 = int(((144) * 2 ** (-mu) + 16) * (SampleRate / 30720000))

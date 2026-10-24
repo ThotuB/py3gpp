@@ -84,6 +84,7 @@ def nrChannelEstimate(
     carrier: nrCarrierConfig | None = None,
 ) -> tuple[NDArray[np.complexfloating], float] | None:
     """Practical channel estimation."""
+    assert rxGrid is not None, "rxGrid is required"
     cp = "normal" if carrier is None else "extended"
     if refGrid is None:
         if (refInd is None) or (refSym is None):
@@ -146,17 +147,18 @@ def nrTimingEstimate(
     waveform: NDArray[np.complex128] | None = None,
     refGrid: NDArray[Any] | None = None,
     nrb: int | None = None,
-    scs: int | None = None,
+    scs: Literal[15, 30, 60, 120, 240] | None = None,
     initialNSlot: int | None = None,
     refInd: NDArray[np.int_] | None = None,
     refSym: NDArray[np.complex128] | None = None,
     CyclicPrefix: Literal["normal", "extended"] = "normal",
     Nfft: int | None = None,
-    SampleRate: float | None = None,
+    SampleRate: int | None = None,
     CarrierFrequency: float = 0,
 ) -> int:
     """Practical timing estimation."""
-    refWaveform, _ = nrOFDMModulate(
+    assert refGrid is not None, "refGrid is required"
+    modulated = nrOFDMModulate(
         grid=refGrid,
         scs=scs,
         initialNSlot=initialNSlot,
@@ -165,9 +167,11 @@ def nrTimingEstimate(
         carrier=carrier,
         CarrierFrequency=CarrierFrequency,
     )
+    assert modulated is not None
+    refWaveform, _ = modulated
     xcorr = scipy.signal.correlate(waveform, refWaveform, "valid")
     index = np.argmax(np.abs(xcorr))
-    return index
+    return int(index)
 
 
 def nrEqualizeMMSE(
