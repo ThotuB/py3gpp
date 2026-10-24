@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
 
-from py3gpp.downlink_physical_channels.nrPDSCH import nrPDSCH
-from py3gpp.downlink_physical_channels.nrPDSCHDecode import nrPDSCHDecode
+from py3gpp.dl.ch.phy.pdsch import nrPDSCH, nrPDSCHDecode
 
 
 @pytest.mark.parametrize("ncellid", [0, 1, 2, 3])

@@ -6,9 +6,9 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
-from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.downlink_physical_signals.nrPDSCHPTRS import nrPDSCHPTRS
+from py3gpp.dl.ch.phy.pdsch import nrPDSCHConfig
+from py3gpp.dl.ofdm import nrCarrierConfig
+from py3gpp.dl.sig.pdsch_ptrs import nrPDSCHPTRS
 
 
 def run_nr_pdschptrs(cfg, eng):

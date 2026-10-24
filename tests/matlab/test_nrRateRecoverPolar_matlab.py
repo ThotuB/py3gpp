@@ -4,7 +4,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.transport_channel_subcomponents.nrRateRecoverPolar import nrRateRecoverPolar
+from py3gpp.plc.trs.polar import nrRateRecoverPolar
 
 
 def run_nrRateRecoverPolar(N, eng):

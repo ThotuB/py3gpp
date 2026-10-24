@@ -4,8 +4,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.downlink_physical_channels.nrPBCH import nrPBCH
-from py3gpp.downlink_physical_channels.nrPBCHIndices import nrPBCHIndices
+from py3gpp.dl.ch.phy.pbch import nrPBCH, nrPBCHIndices
 
 
 def run_nr_pbch(ncellid, databits, v, eng):

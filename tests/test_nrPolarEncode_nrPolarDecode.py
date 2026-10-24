@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
 
-from py3gpp.transport_channel_subcomponents.nrPolarDecode import nrPolarDecode
-from py3gpp.transport_channel_subcomponents.nrPolarEncode import nrPolarEncode
+from py3gpp.plc.trs.polar import nrPolarDecode, nrPolarEncode
 
 
 @pytest.mark.parametrize("K", [100, 151, 200])

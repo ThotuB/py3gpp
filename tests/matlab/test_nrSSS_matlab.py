@@ -4,8 +4,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.downlink_physical_signals.nrSSS import nrSSS
-from py3gpp.downlink_physical_signals.nrSSSIndices import nrSSSIndices
+from py3gpp.dl.sig.ss import nrSSS, nrSSSIndices
 
 
 def run_nr_sss(ncellid, eng):

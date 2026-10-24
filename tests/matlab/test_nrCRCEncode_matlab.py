@@ -4,7 +4,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.transport_channel_subcomponents.nrCRCEncode import nrCRCEncode
+from py3gpp.plc.trs.crc import nrCRCEncode
 
 
 def run_nr_crc_encode(poly, blk_size, eng):

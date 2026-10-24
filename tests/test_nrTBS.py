@@ -1,6 +1,6 @@
 import numpy as np
 
-from py3gpp.transport_channel_subcomponents.nrTBS import nrTBS
+from py3gpp.plc.trs.ref import nrTBS
 
 
 def test_nrTBS_one_codeword():

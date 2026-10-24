@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from py3gpp.downlink_transport_channels.nrDLSCHInfo import nrDLSCHInfo
+from py3gpp.dl.ch.trs.dlsch import nrDLSCHInfo
 
 
 def run_nr_dlsch_info():

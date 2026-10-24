@@ -4,7 +4,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.physical_channel_and_signal_subcomponents.nrPRBS import nrPRBS
+from py3gpp.plc.sym import nrPRBS
 
 
 def run_nr_prbs(cinit, size, eng):

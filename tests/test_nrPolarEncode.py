@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from py3gpp.transport_channel_subcomponents.nrPolarEncode import nrPolarEncode
+from py3gpp.plc.trs.polar import nrPolarEncode
 
 
 def test_nrPolarEncode():

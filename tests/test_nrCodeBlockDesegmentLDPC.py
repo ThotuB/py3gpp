@@ -1,8 +1,8 @@
 import numpy as np
 import test_data.ldpc
 
-from py3gpp.transport_channel_subcomponents.nrCodeBlockDesegmentLDPC import nrCodeBlockDesegmentLDPC
-from py3gpp.transport_channel_subcomponents.nrCRCDecode import nrCRCDecode
+from py3gpp.plc.trs.crc import nrCRCDecode
+from py3gpp.plc.trs.ldpc import nrCodeBlockDesegmentLDPC
 
 
 def test_single_segment():

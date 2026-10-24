@@ -2,7 +2,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.transport_channel_subcomponents.nrRateRecoverLDPC import nrRateRecoverLDPC
+from py3gpp.plc.trs.ldpc import nrRateRecoverLDPC
 
 
 @pytest.fixture(scope="session")

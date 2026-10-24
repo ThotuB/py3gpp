@@ -2,7 +2,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.transport_channel_subcomponents.nrRateMatchLDPC import nrRateMatchLDPC
+from py3gpp.plc.trs.ldpc import nrRateMatchLDPC
 
 
 def run_nrRateMatchLDPC(in_, outlen, rv, mod, nLayers, eng):

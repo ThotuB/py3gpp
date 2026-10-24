@@ -1,6 +1,6 @@
 import numpy as np
 
-from py3gpp.downlink_transport_channels.nrBCH import nrBCH
+from py3gpp.dl.ch.trs.bch import nrBCH
 
 
 def test_nrBCH():

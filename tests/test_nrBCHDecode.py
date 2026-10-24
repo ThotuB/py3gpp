@@ -1,6 +1,6 @@
 import numpy as np
 
-from py3gpp.downlink_transport_channels.nrBCHDecode import nrBCHDecode
+from py3gpp.dl.ch.trs.bch import nrBCHDecode
 
 
 def test_nrBCHDecode():

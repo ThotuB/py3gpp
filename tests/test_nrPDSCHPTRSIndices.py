@@ -5,10 +5,9 @@ import sys
 import numpy as np
 import pytest
 
-from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
-from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.downlink_physical_signals.nrPDSCHPTRS import PDSCHPTRSSyms
-from py3gpp.downlink_physical_signals.nrPDSCHPTRSIndices import nrPDSCHPTRSIndices
+from py3gpp.dl.ch.phy.pdsch import nrPDSCHConfig
+from py3gpp.dl.ofdm import nrCarrierConfig
+from py3gpp.dl.sig.pdsch_ptrs import PDSCHPTRSSyms, nrPDSCHPTRSIndices
 
 sys.path.append("test_data")
 from test_data.pdsch import pdschptrs_indices_ref
