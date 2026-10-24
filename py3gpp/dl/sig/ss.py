@@ -7,6 +7,7 @@ from py3gpp.helper import _calc_m_seq
 
 
 def nrPSS(ncellid: int) -> NDArray[np.int32]:
+    """Generate PSS symbols."""
     assert ncellid >= 0 and ncellid <= 1007, "invalid ncellid"
     N = 7
     c = [0, 1, 1, 0, 1, 1, 1]
@@ -22,6 +23,7 @@ def nrPSSv(ncellid: int) -> int:
 
 
 def nrPSSIndices() -> NDArray[np.int_]:
+    """Generate PSS resource element indices."""
     return np.arange(56, 183)
 
 
@@ -50,9 +52,11 @@ def _gold(ncellid: int) -> NDArray[np.int_]:
 
 
 def nrSSS(ncellid: int) -> NDArray[np.int_]:
+    """Generate SSS symbols."""
     assert ncellid >= 0 and ncellid <= 1007, "invalid ncellid"
     return _gold(ncellid)
 
 
 def nrSSSIndices() -> NDArray[np.int_]:
+    """Generate SSS resource element indices."""
     return np.arange(536, 663)

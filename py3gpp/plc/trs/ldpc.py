@@ -15,6 +15,7 @@ Modulation = Literal["pi/2-BPSK", "BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]
 
 
 def nrCodeBlockSegmentLDPC(blk: NDArray[np.int_], bgn: Literal[1, 2]) -> NDArray[np.int_]:
+    """Code block segmentation for LDPC coding."""
     assert bgn in [1, 2], "bgn must be in [1, 2]"
     cbsInfo = getCBSInfo(len(blk), bgn)
     assert cbsInfo["Lcb"] in [0, 24], f'Error: Lcb = {cbsInfo["Lcb"]} is not supported!'
@@ -46,6 +47,7 @@ def nrCodeBlockSegmentLDPC(blk: NDArray[np.int_], bgn: Literal[1, 2]) -> NDArray
 def nrCodeBlockDesegmentLDPC(
     cbs: NDArray[np.int_], bgn: Literal[1, 2], blklen: int
 ) -> tuple[NDArray[np.floating], bool]:
+    """Code block desegmentation and CRC decoding."""
     assert len(cbs.shape) == 2
     blk = None
     err = False
@@ -322,6 +324,7 @@ def _encode_thangaraj(B: NDArray[np.float64], Zc: int, msg: NDArray[np.floating]
 def nrLDPCEncode(
     cbs: NDArray[np.floating], bgn: int, algo: Literal["sionna", "thangaraj"] = "sionna"
 ) -> NDArray[np.int8]:
+    """LDPC encoding."""
     cbs = cbs.copy()  # don't modify inputs
 
     if algo not in ["sionna", "thangaraj"]:
@@ -450,6 +453,7 @@ def nrLDPCDecode(
     vectorize: bool = True,
     verbose: bool = False,
 ) -> tuple[NDArray[np.uint8], int]:
+    """LDPC decoding."""
     if Algorithm not in ["Layered belief propagation", "Normalized min-sum", "Offset min-sum"]:
         raise ValueError(f"Algorithm {Algorithm} is not supported")
     if len(in_.shape) != 2:
@@ -631,6 +635,7 @@ if __name__ == "__main__":
 def nrRateMatchLDPC(
     in_: NDArray[np.int_], outlen: int, rv: Literal[0, 1, 2, 3], mod: Modulation, nLayers: Literal[1, 2, 3, 4]
 ) -> NDArray[np.int_]:
+    """Rate matching for LDPC encoded data."""
     assert rv in [0, 1, 2, 3], "rv has to be in [0, 1, 2, 3]"
     assert nLayers in [1, 2, 3, 4], "nLayers has to be [1, 2, 3, 4]"
     if mod in ["pi/2-BPSK", "BPSK"]:
@@ -726,6 +731,7 @@ def nrRateRecoverLDPC(
     nLayers: int,
     numCB: int | None = None,
 ) -> NDArray[np.floating]:
+    """Recover rate matched LDPC data."""
     assert (R > 0) and (R < 1), "R has to be 0 < R < 1"
     assert rv in [0, 1, 2, 3], "rv has to be in [0, 1, 2, 3]"
 

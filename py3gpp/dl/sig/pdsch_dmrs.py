@@ -16,15 +16,20 @@ if TYPE_CHECKING:
 
 
 def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig) -> NDArray[np.complex128]:
+    """Generate PDSCH DM-RS symbols."""
     if cfg.DMRS.DMRSConfigurationType == 1:
         n_dmrs_per_re = 6
     else:
         n_dmrs_per_re = 4
     n_dmrs_bits_re = 2 * n_dmrs_per_re
 
+    NSizeBWP = carrier.NSizeGrid if cfg.NSizeBWP is None else cfg.NSizeBWP
+    # TS 38.211 7.4.1.1.1: NIDNSCID defaults to the physical cell ID when not configured
+    NIDNSCID = carrier.NCellID if cfg.DMRS.NIDNSCID is None else cfg.DMRS.NIDNSCID
+
     dmrs_begin = n_dmrs_bits_re * min(cfg.PRBSet)
     dmrs_end = n_dmrs_bits_re * (max(cfg.PRBSet) + 1)
-    dmrs_size = n_dmrs_bits_re * cfg.NSizeBWP
+    dmrs_size = n_dmrs_bits_re * NSizeBWP
 
     n_scid = 0
 
@@ -33,7 +38,7 @@ def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig) -> NDArray[np.comp
     # Start generation for every symbol
     dmrs_syms = np.array([])
     for n_symb in occupied_syms:
-        cinit_dmrs = PDSCHDMRScinit(carrier.SymbolsPerSlot, carrier.NSlot, n_symb, cfg.DMRS.NIDNSCID, n_scid)
+        cinit_dmrs = PDSCHDMRScinit(carrier.SymbolsPerSlot, carrier.NSlot, n_symb, NIDNSCID, n_scid)
         dmrs_prbs = nrPRBS(cinit_dmrs, dmrs_size)
 
         # Cut PRBS sequency
@@ -96,8 +101,9 @@ def PDSCHDMRScinit(sps: int, n_slot: int, n_symb: int, NIDSCID: int, n_scid: int
 
 
 def nrPDSCHDMRSIndices(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> NDArray[np.int_]:
+    """Generate PDSCH DM-RS indices."""
     NRBSize = carrier.NStartGrid if not cfg.NRBSize else cfg.NRBSize
-    NSizeBWP = carrier.NSizeGrid if not cfg.NSizeBWP else cfg.NSizeBWP
+    NSizeBWP = carrier.NSizeGrid if cfg.NSizeBWP is None else cfg.NSizeBWP
 
     frame_begin = NRBSize * min(cfg.PRBSet)
     frame_end = NRBSize * (max(cfg.PRBSet) + 1)

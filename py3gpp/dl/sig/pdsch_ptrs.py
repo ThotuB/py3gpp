@@ -17,15 +17,19 @@ if TYPE_CHECKING:
 
 
 def nrPDSCHPTRS(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> list | NDArray[np.complex128]:
+    """Generate PDSCH PT-RS symbols."""
     if cfg.EnablePTRS == 0:
         return []
 
-    bwp_size = cfg.NRBSize * cfg.NSizeBWP
+    NSizeBWP = carrier.NSizeGrid if cfg.NSizeBWP is None else cfg.NSizeBWP
+    bwp_size = cfg.NRBSize * NSizeBWP
 
     # Generates first DMRS symbol (l0)
     n_scid = 0
+    # TS 38.211 7.4.1.1.1: NIDNSCID defaults to the physical cell ID when not configured
+    NIDNSCID = carrier.NCellID if cfg.DMRS.NIDNSCID is None else cfg.DMRS.NIDNSCID
     dmrs_occupied_syms = PDSCHDMRSSyms(cfg)
-    cinit_dmrs = PDSCHPTRScinit(carrier.SymbolsPerSlot, carrier.NSlot, dmrs_occupied_syms[0], cfg.DMRS.NIDNSCID, n_scid)
+    cinit_dmrs = PDSCHPTRScinit(carrier.SymbolsPerSlot, carrier.NSlot, dmrs_occupied_syms[0], NIDNSCID, n_scid)
     dmrs_prbs = nrPRBS(cinit_dmrs, bwp_size)
     dmrs_sym = nrSymbolModulate(dmrs_prbs, "QPSK")
 
@@ -98,12 +102,15 @@ def PDSCHPTRScinit(sps: int, n_slot: int, n_symb: int, NIDSCID: int, n_scid: int
 
 
 def nrPDSCHPTRSIndices(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> NDArray[Any]:
+    """Generate PDSCH PT-RS Indices."""
     if cfg.EnablePTRS == 0:
         return np.array([])
 
+    NSizeBWP = carrier.NSizeGrid if cfg.NSizeBWP is None else cfg.NSizeBWP
+
     frame_begin = cfg.NRBSize * min(cfg.PRBSet)
     frame_end = cfg.NRBSize * (max(cfg.PRBSet) + 1)
-    frame_size = cfg.NRBSize * cfg.NSizeBWP
+    frame_size = cfg.NRBSize * NSizeBWP
 
     # Align with frequency offset based on DMRS type
     if cfg.DMRS.DMRSConfigurationType == 1:

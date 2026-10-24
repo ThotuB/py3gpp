@@ -12,6 +12,8 @@ Scenario = Literal["UMa", "UMi", "RMa", "InH", "InF-SL", "InF-DL", "InF-SH", "In
 
 
 class nrPathLossConfig:
+    """Path loss configuration parameters."""
+
     def __init__(self) -> None:
         self._Scenario: Scenario = "UMa"
         self._BuildingHeight: int = 5
@@ -81,6 +83,7 @@ def nrChannelEstimate(
     refGrid: NDArray[np.complexfloating] | None = None,
     carrier: nrCarrierConfig | None = None,
 ) -> tuple[NDArray[np.complexfloating], float] | None:
+    """Practical channel estimation."""
     cp = "normal" if carrier is None else "extended"
     if refGrid is None:
         if (refInd is None) or (refSym is None):
@@ -152,6 +155,7 @@ def nrTimingEstimate(
     SampleRate: float | None = None,
     CarrierFrequency: float = 0,
 ) -> int:
+    """Practical timing estimation."""
     refWaveform, _ = nrOFDMModulate(
         grid=refGrid,
         scs=scs,
@@ -169,6 +173,7 @@ def nrTimingEstimate(
 def nrEqualizeMMSE(
     rxSym: NDArray[np.complexfloating], hest: NDArray[np.complexfloating], nVar: float
 ) -> tuple[NDArray[np.complexfloating], NDArray[np.floating]]:
+    """Minimum mean-squared error (MMSE) equalization."""
     csi = np.abs(hest * np.conj(hest)) + nVar
     # rxEq = rxSym / hest # zero forcing
     rxEq = rxSym * np.conj(hest) / csi
@@ -176,6 +181,7 @@ def nrEqualizeMMSE(
 
 
 def nrExtractResources(ind: NDArray[np.int_], grid: NDArray[Any]) -> NDArray[Any]:
+    """Extract resource elements from resource array."""
     return grid.ravel(order="F")[ind]
 
 
@@ -188,6 +194,7 @@ def nrPathLoss(
     bs: NDArray[np.floating],
     ue: NDArray[np.floating],
 ) -> tuple[float, float]:
+    """Path loss and shadow fading between BS and UE."""
 
     # Check the input types
     if not isinstance(freq, (int, float)):

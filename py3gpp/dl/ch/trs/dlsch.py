@@ -7,6 +7,7 @@ from numpy.typing import NDArray
 
 
 def nrDLSCHInfo(tbs: int | None, tcr: float) -> dict[str, Any]:
+    """Get downlink shared channel (DL-SCH) information."""
     assert tbs >= 0
     assert type(tbs) == int
     assert tcr > 0 and tcr < 1

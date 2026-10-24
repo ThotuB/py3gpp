@@ -20,6 +20,7 @@ def nrTBS(
 
     ### Pre-defined table ###
 
+    """Transport block size."""
     modulation_schemes = {"pi/2-BPSK": 1, "QPSK": 2, "16QAM": 4, "64QAM": 6, "256QAM": 8, "1024QAM": 10}
 
     tbs_values = [
@@ -524,6 +525,7 @@ class pdsch_mcs_table_class:
 
 
 def nrPDSCHMCSTables() -> pdsch_mcs_table_class:
+    """PDSCH MCS mapping tables."""
     return pdsch_mcs_table_class()
 
 

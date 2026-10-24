@@ -12,6 +12,7 @@ from py3gpp.helper import _calc_m_seq
 
 # TS 38.211 Section 5.2.1
 def nrPRBS(c_init: int, length: int) -> NDArray[np.int32]:
+    """Generate PRBS."""
     assert length > 0
 
     N = 31
@@ -34,6 +35,7 @@ def nrPRBS(c_init: int, length: int) -> NDArray[np.int32]:
 
 # 38.211 5.1 Modulation mapper
 def nrSymbolModulate(databits: NDArray[np.int_], modulation: str) -> NDArray[np.complex128]:
+    """Generate modulated symbols."""
     int_modtype = modulation.lower()
 
     assert int_modtype in ["pi/2-bpsk", "bpsk", "qpsk", "16qam", "64qam", "256qam"], "modulation type is incorrect"
@@ -133,6 +135,7 @@ def nrSymbolDemodulate(
     nVar: float = 1e-10,
     DecisionType: Literal["soft", "hard"] = "soft",
 ) -> NDArray[np.floating] | NDArray[np.integer]:
+    """Demodulate and convert symbols to bits."""
     r_i = np.real(input)
     r_q = np.imag(input)
     if mod == "BPSK":
@@ -186,6 +189,7 @@ def nrSymbolDemodulate(
 def nrLayerMap(
     in_symbols: NDArray[np.complexfloating] | list[NDArray[np.complexfloating]], nLayers: int
 ) -> NDArray[np.float64]:
+    """Layer mapping of modulated and scrambled codewords."""
 
     # Check number of modulation symbols from either one or two codewords
     if isinstance(in_symbols, np.ndarray):
@@ -271,12 +275,14 @@ def nrLayerMap(
 
 
 def nrTransformPrecode(modSym: NDArray[np.complex128], mrb: int) -> NDArray[np.complex128]:
+    """Generate transform precoded symbols."""
     mrb = int(mrb)
     assert modSym.shape[0] % (mrb * 12) == 0, "input number of rows must be an integer multiple of mrb * 12"
     return (np.fft.fft(modSym.reshape(int(modSym.shape[0] / (mrb * 12)), mrb * 12)) * 1 / np.sqrt(mrb * 12)).ravel()
 
 
 def nrTransformDeprecode(modSym: NDArray[np.complex128], mrb: int) -> NDArray[np.complex128]:
+    """Recover transform deprecoded symbols."""
     mrb = int(mrb)
     assert modSym.shape[0] % (mrb * 12) == 0, "input number of rows must be an integer multiple of mrb * 12"
     return (np.fft.ifft(modSym.reshape(int(modSym.shape[0] / (mrb * 12)), mrb * 12)) * np.sqrt(mrb * 12)).ravel()

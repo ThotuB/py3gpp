@@ -9,6 +9,7 @@ from py3gpp.plc.trs.polar import nrPolarDecode, nrPolarEncode, nrRateMatchPolar,
 
 
 def nrBCH(trblk: NDArray[np.int_], sfn: int, hrf: int, lssb: int, idxoffset: int, ncellid: int) -> NDArray[np.int_]:
+    """Broadcast channel (BCH) encoding."""
     # interleaving according to TS38.212 7.1.1
     # fmt: off
     G = [16, 23, 18, 17, 8, 30, 10, 6, 24, 7, 0, 5, 3, 2, 1, 4, 9, 11, 12, 13, 14, 15, 19, 20, 21, 22, 25, 26, 27, 28,
@@ -72,6 +73,7 @@ def nrBCH(trblk: NDArray[np.int_], sfn: int, hrf: int, lssb: int, idxoffset: int
 def nrBCHDecode(
     softbits: NDArray[np.float64], L: int, lssb: int | None = None, ncellid: int | None = None
 ) -> tuple[NDArray[np.int_], int] | tuple[NDArray[np.int_], int, NDArray[np.int_], NDArray[np.int_], int, int]:
+    """Broadcast channel (BCH) decoding."""
     K = 32 + 24
     E = 864
     L = 8

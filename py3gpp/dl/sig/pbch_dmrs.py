@@ -9,6 +9,7 @@ from py3gpp.plc.sym import nrPRBS, nrSymbolModulate
 
 
 def nrPBCHDMRS(ncellid: int, ibar_SSB: int) -> NDArray[np.complex128]:
+    """Generate PBCH DM-RS symbols."""
     assert ncellid >= 0 and ncellid <= 1007
     assert ibar_SSB >= 0 and ibar_SSB <= 7
 
@@ -25,6 +26,7 @@ def nrPBCHDMRScinit(issb: int, ncellid: int) -> int:
 def nrPBCHDMRSIndices(
     ncellid: int, style: Literal["python", "matlab"] = "matlab"
 ) -> tuple[tuple[int, ...], tuple[int, ...]] | NDArray[np.int_]:
+    """Generate PBCH DM-RS resource element indices."""
     indices_sym1_3 = np.arange(ncellid % 4, 240, 4)
     indices_sym2 = np.concatenate((np.arange(ncellid % 4, 48, 4), np.arange(192 + ncellid % 4, 240, 4)))
     if style == "python":

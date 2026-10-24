@@ -73,7 +73,7 @@ class DMRSConfigBase:
         self._DMRSLength: int = 1
         self._CustomSymbolSet: list = []
         self._DMRSPortSet: list = []
-        self._NIDNSCID: int | list = []
+        self._NIDNSCID: int | None = None
         self._NSCID: int = 0
 
     @property
@@ -137,7 +137,7 @@ class DMRSConfigBase:
         self._DMRSPortSet = set
 
     @property
-    def NIDNSCID(self) -> int | list:
+    def NIDNSCID(self) -> int | None:
         return self._NIDNSCID
 
     @NIDNSCID.setter
@@ -156,6 +156,8 @@ class DMRSConfigBase:
 
 
 class nrPDSCHDMRSConfig(DMRSConfigBase):
+    """PDSCH DM-RS configuration parameters."""
+
     def __init__(self) -> None:
         super().__init__()
         self._DMRSConfigurationType: Literal[1, 2] = 1
@@ -240,6 +242,8 @@ class PDSCHPTRSConfigBase:
 
 
 class nrPDSCHPTRSConfig(PDSCHPTRSConfigBase):
+    """PDSCH PT-RS configuration parameters."""
+
     def __init__(self) -> None:
         super().__init__()
         self._PTRSPortSet: list = []
@@ -318,12 +322,14 @@ class PDSCHConfigBase:
 
 
 class nrPDSCHConfig(PDSCHConfigBase, CommonConfig):
+    """PDSCH configuration parameters."""
+
     def __init__(self) -> None:
         PDSCHConfigBase.__init__(self)
         CommonConfig.__init__(self)
         self._Nid: int = 0
-        self._NSizeBWP: int | list = []
-        self._NStartBWP: int | list = []
+        self._NSizeBWP: int | None = None
+        self._NStartBWP: int | None = None
 
     @property
     def NRBSize(self) -> int:
@@ -339,7 +345,7 @@ class nrPDSCHConfig(PDSCHConfigBase, CommonConfig):
         self._Nid = nid
 
     @property
-    def NSizeBWP(self) -> int | list:
+    def NSizeBWP(self) -> int | None:
         return self._NSizeBWP
 
     @NSizeBWP.setter
@@ -348,7 +354,7 @@ class nrPDSCHConfig(PDSCHConfigBase, CommonConfig):
         self._NSizeBWP = size
 
     @property
-    def NStartBWP(self) -> int | list:
+    def NStartBWP(self) -> int | None:
         return self._NStartBWP
 
     @NStartBWP.setter
@@ -360,6 +366,7 @@ class nrPDSCHConfig(PDSCHConfigBase, CommonConfig):
 def nrPDSCH(
     cws: list[NDArray[np.int_]], modulation: list[str], nlayers: int, nid: int, nrnti: int
 ) -> NDArray[np.complex128]:
+    """Generate PDSCH modulation symbols."""
     if nlayers != 1:
         raise NotImplementedError("not ready yet")
     assert nlayers in list(range(1, 9))
@@ -388,6 +395,7 @@ def nrPDSCH(
 
 
 def nrPDSCHDecode(sym: NDArray[np.complex128], mod: list[str], nid: int, rnti: int) -> NDArray[np.float64]:
+    """Decode PDSCH modulation symbols."""
     descrambled_bits = []
     n_layers = sym.shape[0]
     if n_layers != 1:
@@ -403,13 +411,16 @@ def nrPDSCHDecode(sym: NDArray[np.complex128], mod: list[str], nid: int, rnti: i
 
 
 def nrPDSCHIndices(carrier: nrCarrierConfig, pdsch: nrPDSCHConfig) -> NDArray[np.int_]:
+    """Generate PDSCH resource element indices."""
+    NStartBWP = carrier.NStartGrid if pdsch.NStartBWP is None else pdsch.NStartBWP
+
     frame_begin = pdsch.NRBSize * (min(pdsch.PRBSet))
     frame_end = pdsch.NRBSize * (max(pdsch.PRBSet) + 1)
 
     occupied_syms = np.arange(pdsch.SymbolAllocation[0], pdsch.SymbolAllocation[1])
     indices = np.repeat(np.expand_dims(np.arange(frame_begin, frame_end), 0), occupied_syms.shape[0], axis=0)
     for i in range(indices.shape[0]):
-        indices[i, :] += carrier.NSizeGrid * pdsch.NRBSize * i + pdsch.NStartBWP * pdsch.NRBSize
+        indices[i, :] += carrier.NSizeGrid * pdsch.NRBSize * i + NStartBWP * pdsch.NRBSize
     indices = np.delete(indices, PDSCHDMRSSyms(pdsch), axis=0)
     return indices.ravel()
 

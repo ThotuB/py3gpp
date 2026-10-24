@@ -9,6 +9,7 @@ from py3gpp.helper import generate_5g_ranking, polar_precode_interleave
 
 
 def nrPolarEncode(payload: NDArray[np.int_], E: int, nmax: int = 9, iil: bool = False) -> NDArray[np.int_]:
+    """Polar encoding."""
     K = payload.shape[0]
     assert not (iil and K > 164), "iil is not supported for K > 164"
     _, info_pos = generate_5g_ranking(k=K, n=2**nmax)
@@ -2178,6 +2179,7 @@ def nrPolarDecode(
     iil: bool = True,
     CRClen: Literal[6, 11, 24] = 24,
 ) -> NDArray[np.int_]:
+    """Polar decoding."""
     if CRClen not in (6, 11, 24):
         print("Error: invalid CRClen value!")
         exit()
@@ -3429,6 +3431,7 @@ def subblock_interleaving(u: NDArray[np.int_]) -> NDArray[np.int_]:
 
 
 def nrRateMatchPolar(enc: NDArray[np.int_], K: int, E: int, ibil: bool = False) -> NDArray[np.int_]:
+    """Rate matching for Polar encoded data."""
     # TODO: for what is the parameter K??
     N = enc.shape[0]
     d = np.zeros(N, int)
@@ -4846,6 +4849,7 @@ if __name__ == "__main__":
 def nrRateRecoverPolar(
     llr: NDArray[np.floating], K: int, N: int, ibil: bool = False, discardRepetition: bool = True
 ) -> NDArray[np.floating]:
+    """Recover rate matched Polar data."""
     E = llr.shape[0]
     if N <= E:
         # undo repetition

@@ -31,6 +31,8 @@ class nrNumerologyConfig:
 
 
 class nrCarrierConfig(nrNumerologyConfig):
+    """Carrier configuration parameters."""
+
     def __init__(
         self,
         NCellID: int = 1,
@@ -112,6 +114,7 @@ class nrCarrierConfig(nrNumerologyConfig):
 def nrOFDMInfo(
     carrier: nrCarrierConfig | None = None, nrb: int | None = None, scs: int | None = None
 ) -> dict[str, int] | None:
+    """Get OFDM information."""
     if nrb is None or scs is None:
         if carrier is None:
             print("Error: carrier is needed when no nrb or scs is given!")
@@ -140,6 +143,7 @@ def nrOFDMModulate(
     Windowing: Any | None = None,
     CarrierFrequency: float = 0,
 ) -> list | None:
+    """Generate OFDM modulated waveform."""
     info = {}
 
     if carrier is None:
@@ -231,6 +235,7 @@ def nrOFDMDemodulate(
     CarrierFrequency: float = 0,
     CyclicPrefixFraction: float = 0.5,
 ) -> NDArray[np.complexfloating] | None:
+    """Demodulate OFDM waveform."""
     if waveform is None:
         print("Error: no waveform given!")
         return
@@ -304,6 +309,7 @@ def nrOFDMDemodulate(
 
 
 def nrResourceGrid(carrier: nrCarrierConfig, p: int = 1) -> NDArray[np.complex128]:
+    """Generate empty carrier slot resource grid."""
     SymbolsPerSlot = 14
     if p == 1:
         grid = np.zeros((12 * carrier.NSizeGrid, SymbolsPerSlot), "complex")

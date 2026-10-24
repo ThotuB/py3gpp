@@ -9,6 +9,7 @@ CRCPoly = Literal["6", "11", "16", "24A", "24B", "24C"]
 
 
 def nrCRCEncode(blk: NDArray[np.int_], poly: CRCPoly, mask: int = 0) -> NDArray[np.int_]:
+    """CRC encoding."""
     if len(blk.shape) == 1:
         blk = np.expand_dims(blk, axis=1)
     if poly == "6":
@@ -75,6 +76,7 @@ def _binToInt(bin: NDArray[np.int_]) -> int:
 
 
 def nrCRCDecode(blkcrc: NDArray[np.int_], poly: CRCPoly, mask: int = 0) -> tuple[NDArray[np.int_], int]:
+    """CRC decoding."""
     encoded = nrCRCEncode(blkcrc, poly, mask)
     L = len(encoded) - len(blkcrc)
     crc = encoded[-L:]

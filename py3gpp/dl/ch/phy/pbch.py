@@ -12,11 +12,13 @@ from py3gpp.plc.sym import nrSymbolModulate
 # v: scrambling sequence phase, 0..7
 # n: number of elements in output sequence
 def nrPBCHPRBS(ncellid: int, v: int, n: int) -> NDArray[np.int32]:
+    """Generate PBCH scrambling sequence."""
     seq = _calc_gold(ncellid, n + v * n)
     return seq[v * n :][:n]
 
 
 def nrPBCH(ncellid: int, v: int, databits: NDArray[np.int_]) -> NDArray[np.complex128]:
+    """Generate PBCH modulation symbols."""
     n = len(databits)
 
     assert ncellid <= 1007 and ncellid >= 0
@@ -34,5 +36,6 @@ def nrPBCH(ncellid: int, v: int, databits: NDArray[np.int_]) -> NDArray[np.compl
 
 
 def nrPBCHIndices(ibar: int) -> NDArray[np.int_]:
+    """Generate PBCH resource element indices."""
     indices = np.hstack((np.arange(240, 480), np.arange(480, 528), np.arange(672, 720), np.arange(720, 960)))
     return np.setdiff1d(indices, nrPBCHDMRSIndices(ibar))
