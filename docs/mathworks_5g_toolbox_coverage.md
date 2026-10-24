@@ -4,7 +4,7 @@ Function/class inventory crawled from the MathWorks 5G Toolbox documentation (`m
 
 Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks uses on each page (e.g. "CRC Operations", "Physical Broadcast Channel"). Where a page presents its functions as one flat list with no such labels, it's kept as a single table.
 
-**Summary: 53 of 136 unique functions/classes implemented (~39%).** Uplink is a complete gap (0 of 48). PDCCH/DCI and PUCCH/PRACH families are entirely unimplemented. Status is matched by exact file name under `py3gpp/` — a function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
+**Summary: 53 of 136 unique functions/classes implemented (~39%).** Uplink is a complete gap (0 of 48). PDCCH/DCI and PUCCH/PRACH families are entirely unimplemented. Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
 
 ---
 
@@ -16,25 +16,25 @@ Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks us
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPSS` | Generate PSS symbols | ✅ `downlink_physical_signals/` |
-| `nrPSSIndices` | Generate PSS resource element indices | ✅ `downlink_physical_signals/` |
-| `nrSSS` | Generate SSS symbols | ✅ `downlink_physical_signals/` |
-| `nrSSSIndices` | Generate SSS resource element indices | ✅ `downlink_physical_signals/` |
+| `nrPSS` | Generate PSS symbols | ✅ `dl/sig/ss.py` |
+| `nrPSSIndices` | Generate PSS resource element indices | ✅ `dl/sig/ss.py` |
+| `nrSSS` | Generate SSS symbols | ✅ `dl/sig/ss.py` |
+| `nrSSSIndices` | Generate SSS resource element indices | ✅ `dl/sig/ss.py` |
 
 #### PDSCH Demodulation Reference Signal
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPDSCHDMRS` | Generate PDSCH DM-RS symbols | ✅ `downlink_physical_signals/` |
-| `nrPDSCHDMRSIndices` | Generate PDSCH DM-RS indices | ✅ `downlink_physical_signals/` |
-| `nrPDSCHDMRSConfig` | PDSCH DM-RS configuration parameters | ✅ `configs/` |
+| `nrPDSCHDMRS` | Generate PDSCH DM-RS symbols | ✅ `dl/sig/pdsch_dmrs.py` |
+| `nrPDSCHDMRSIndices` | Generate PDSCH DM-RS indices | ✅ `dl/sig/pdsch_dmrs.py` |
+| `nrPDSCHDMRSConfig` | PDSCH DM-RS configuration parameters | ✅ `dl/ch/phy/pdsch.py` |
 
 #### PBCH Demodulation Reference Signal
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPBCHDMRS` | Generate PBCH DM-RS symbols | ✅ `downlink_physical_signals/` |
-| `nrPBCHDMRSIndices` | Generate PBCH DM-RS resource element indices | ✅ `downlink_physical_signals/` |
+| `nrPBCHDMRS` | Generate PBCH DM-RS symbols | ✅ `dl/sig/pbch_dmrs.py` |
+| `nrPBCHDMRSIndices` | Generate PBCH DM-RS resource element indices | ✅ `dl/sig/pbch_dmrs.py` |
 
 #### Channel State Information Reference Signal
 
@@ -49,9 +49,9 @@ Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks us
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPDSCHPTRS` | Generate PDSCH PT-RS symbols | ✅ `downlink_physical_signals/` |
-| `nrPDSCHPTRSIndices` | Generate PDSCH PT-RS Indices | ✅ `downlink_physical_signals/` |
-| `nrPDSCHPTRSConfig` | PDSCH PT-RS configuration parameters | ✅ `configs/` |
+| `nrPDSCHPTRS` | Generate PDSCH PT-RS symbols | ✅ `dl/sig/pdsch_ptrs.py` |
+| `nrPDSCHPTRSIndices` | Generate PDSCH PT-RS Indices | ✅ `dl/sig/pdsch_ptrs.py` |
+| `nrPDSCHPTRSConfig` | PDSCH PT-RS configuration parameters | ✅ `dl/ch/phy/pdsch.py` |
 
 #### Positioning Reference Signal
 
@@ -65,8 +65,8 @@ Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks us
 
 | Function | Description | Status |
 |---|---|---|
-| `nrCarrierConfig` | Carrier configuration parameters | ✅ `configs/` |
-| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `downlink_ofdm_modulation/` |
+| `nrCarrierConfig` | Carrier configuration parameters | ✅ `dl/ofdm.py` |
+| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `dl/ofdm.py` |
 
 ### Downlink Physical Channels
 
@@ -74,29 +74,29 @@ Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks us
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPBCH` | Generate PBCH modulation symbols | ✅ `downlink_physical_channels/` |
-| `nrPBCHIndices` | Generate PBCH resource element indices | ✅ `downlink_physical_channels/` |
-| `nrPBCHPRBS` | Generate PBCH scrambling sequence | ✅ `downlink_physical_channels/` |
+| `nrPBCH` | Generate PBCH modulation symbols | ✅ `dl/ch/phy/pbch.py` |
+| `nrPBCHIndices` | Generate PBCH resource element indices | ✅ `dl/ch/phy/pbch.py` |
+| `nrPBCHPRBS` | Generate PBCH scrambling sequence | ✅ `dl/ch/phy/pbch.py` |
 | `nrPBCHDecode` | Decode PBCH modulation symbols | ❌ (py3gpp only has transport-level `nrBCHDecode`) |
 
 #### Physical Downlink Shared Channel
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPDSCH` | Generate PDSCH modulation symbols | ✅ `downlink_physical_channels/` |
-| `nrPDSCHIndices` | Generate PDSCH resource element indices | ✅ `downlink_physical_channels/` |
-| `nrPDSCHConfig` | PDSCH configuration parameters | ✅ `configs/` |
+| `nrPDSCH` | Generate PDSCH modulation symbols | ✅ `dl/ch/phy/pdsch.py` |
+| `nrPDSCHIndices` | Generate PDSCH resource element indices | ✅ `dl/ch/phy/pdsch.py` |
+| `nrPDSCHConfig` | PDSCH configuration parameters | ✅ `dl/ch/phy/pdsch.py` |
 | `nrPDSCHPrecode` | Precoding for PDSCH PRG bundling | ❌ |
 | `nrPRGInfo` | Precoding resource block group information | ❌ |
-| `nrPDSCHDecode` | Decode PDSCH modulation symbols | ✅ `downlink_physical_channels/` |
+| `nrPDSCHDecode` | Decode PDSCH modulation symbols | ✅ `dl/ch/phy/pdsch.py` |
 | `nrPDSCHReservedConfig` | PDSCH reserved PRB configuration parameters | ❌ |
-| `nrPDSCHPRBS` | Generate PDSCH scrambling sequence | ❌ (scrambling likely inlined in `nrPDSCH.py`) |
-| `nrPDSCHDMRS` | Generate PDSCH DM-RS symbols | ✅ `downlink_physical_signals/` |
-| `nrPDSCHDMRSIndices` | Generate PDSCH DM-RS indices | ✅ `downlink_physical_signals/` |
-| `nrPDSCHDMRSConfig` | PDSCH DM-RS configuration parameters | ✅ `configs/` |
-| `nrPDSCHPTRS` | Generate PDSCH PT-RS symbols | ✅ `downlink_physical_signals/` |
-| `nrPDSCHPTRSIndices` | Generate PDSCH PT-RS Indices | ✅ `downlink_physical_signals/` |
-| `nrPDSCHPTRSConfig` | PDSCH PT-RS configuration parameters | ✅ `configs/` |
+| `nrPDSCHPRBS` | Generate PDSCH scrambling sequence | ❌ (scrambling likely inlined in `dl/ch/phy/pdsch.py`) |
+| `nrPDSCHDMRS` | Generate PDSCH DM-RS symbols | ✅ `dl/sig/pdsch_dmrs.py` |
+| `nrPDSCHDMRSIndices` | Generate PDSCH DM-RS indices | ✅ `dl/sig/pdsch_dmrs.py` |
+| `nrPDSCHDMRSConfig` | PDSCH DM-RS configuration parameters | ✅ `dl/ch/phy/pdsch.py` |
+| `nrPDSCHPTRS` | Generate PDSCH PT-RS symbols | ✅ `dl/sig/pdsch_ptrs.py` |
+| `nrPDSCHPTRSIndices` | Generate PDSCH PT-RS Indices | ✅ `dl/sig/pdsch_ptrs.py` |
+| `nrPDSCHPTRSConfig` | PDSCH PT-RS configuration parameters | ✅ `dl/ch/phy/pdsch.py` |
 
 #### Physical Downlink Control Channel
 
@@ -115,8 +115,8 @@ Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks us
 
 | Function | Description | Status |
 |---|---|---|
-| `nrCarrierConfig` | Carrier configuration parameters | ✅ `configs/` |
-| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `downlink_ofdm_modulation/` |
+| `nrCarrierConfig` | Carrier configuration parameters | ✅ `dl/ofdm.py` |
+| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `dl/ofdm.py` |
 
 ### Downlink Transport Channels
 
@@ -124,16 +124,16 @@ Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks us
 
 | Function | Description | Status |
 |---|---|---|
-| `nrBCH` | Broadcast channel (BCH) encoding | ✅ `downlink_transport_channels/` |
-| `nrBCHDecode` | Broadcast channel (BCH) decoding | ✅ `downlink_transport_channels/` |
+| `nrBCH` | Broadcast channel (BCH) encoding | ✅ `dl/ch/trs/bch.py` |
+| `nrBCHDecode` | Broadcast channel (BCH) decoding | ✅ `dl/ch/trs/bch.py` |
 
 #### Downlink Shared Channel
 
 | Function | Description | Status |
 |---|---|---|
-| `nrDLSCH` | Apply DL-SCH encoder processing chain | ❌ (steps exist individually: CRC/LDPC/rate-match in `transport_channel_subcomponents/`, no single pipeline wrapper) |
+| `nrDLSCH` | Apply DL-SCH encoder processing chain | ❌ (steps exist individually: CRC/LDPC/rate-match in `plc/trs/`, no single pipeline wrapper) |
 | `nrDLSCHDecoder` | Apply DL-SCH decoder processing chain | ❌ (same — no wrapper) |
-| `nrDLSCHInfo` | Get downlink shared channel (DL-SCH) information | ✅ `downlink_transport_channels/` |
+| `nrDLSCHInfo` | Get downlink shared channel (DL-SCH) information | ✅ `dl/ch/trs/dlsch.py` |
 
 ### Downlink Control Information
 
@@ -150,10 +150,10 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrOFDMModulate` | Generate OFDM modulated waveform | ✅ `downlink_ofdm_modulation/` |
-| `nrOFDMDemodulate` | Demodulate OFDM waveform | ✅ `downlink_ofdm_modulation/` |
-| `nrOFDMInfo` | Get OFDM information | ✅ `downlink_ofdm_modulation/` |
-| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `downlink_ofdm_modulation/` |
+| `nrOFDMModulate` | Generate OFDM modulated waveform | ✅ `dl/ofdm.py` |
+| `nrOFDMDemodulate` | Demodulate OFDM waveform | ✅ `dl/ofdm.py` |
+| `nrOFDMInfo` | Get OFDM information | ✅ `dl/ofdm.py` |
+| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `dl/ofdm.py` |
 
 ---
 
@@ -246,8 +246,8 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrCarrierConfig` | Carrier configuration parameters | ✅ `configs/` |
-| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `downlink_ofdm_modulation/` |
+| `nrCarrierConfig` | Carrier configuration parameters | ✅ `dl/ofdm.py` |
+| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `dl/ofdm.py` |
 | `nrIntraCellGuardBandsConfig` | Intracell guard bands configuration parameters | ❌ |
 
 ### Uplink Transport Channels
@@ -277,14 +277,14 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrOFDMModulate` | Generate OFDM modulated waveform | ✅ `downlink_ofdm_modulation/` (shared, not UL-specific) |
-| `nrOFDMDemodulate` | Demodulate OFDM waveform | ✅ `downlink_ofdm_modulation/` (shared) |
-| `nrOFDMInfo` | Get OFDM information | ✅ `downlink_ofdm_modulation/` (shared) |
+| `nrOFDMModulate` | Generate OFDM modulated waveform | ✅ `dl/ofdm.py` (shared, not UL-specific) |
+| `nrOFDMDemodulate` | Demodulate OFDM waveform | ✅ `dl/ofdm.py` (shared) |
+| `nrOFDMInfo` | Get OFDM information | ✅ `dl/ofdm.py` (shared) |
 | `nrPRACHOFDMModulate` | Generate PRACH OFDM modulated waveform | ❌ |
 | `nrPRACHOFDMInfo` | Get PRACH OFDM information | ❌ |
-| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `downlink_ofdm_modulation/` (shared) |
-| `nrTransformPrecode` | Generate transform precoded symbols | ✅ `physical_channel_and_signal_subcomponents/` |
-| `nrTransformDeprecode` | Recover transform deprecoded symbols | ✅ `physical_channel_and_signal_subcomponents/` |
+| `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `dl/ofdm.py` (shared) |
+| `nrTransformPrecode` | Generate transform precoded symbols | ✅ `plc/sym.py` |
+| `nrTransformDeprecode` | Recover transform deprecoded symbols | ✅ `plc/sym.py` |
 
 ---
 
@@ -296,36 +296,36 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrCRCEncode` | CRC encoding | ✅ `transport_channel_subcomponents/` |
-| `nrCRCDecode` | CRC decoding | ✅ `transport_channel_subcomponents/` |
+| `nrCRCEncode` | CRC encoding | ✅ `plc/trs/crc.py` |
+| `nrCRCDecode` | CRC decoding | ✅ `plc/trs/crc.py` |
 
 #### LDPC Processing
 
 | Function | Description | Status |
 |---|---|---|
-| `nrLDPCEncode` | LDPC encoding | ✅ `transport_channel_subcomponents/` |
-| `nrLDPCDecode` | LDPC decoding | ✅ `transport_channel_subcomponents/` |
-| `nrRateMatchLDPC` | Rate matching for LDPC encoded data | ✅ `transport_channel_subcomponents/` |
-| `nrRateRecoverLDPC` | Recover rate matched LDPC data | ✅ `transport_channel_subcomponents/` |
-| `nrCodeBlockSegmentLDPC` | Code block segmentation for LDPC coding | ✅ `transport_channel_subcomponents/` |
-| `nrCodeBlockDesegmentLDPC` | Code block desegmentation and CRC decoding | ✅ `transport_channel_subcomponents/` |
+| `nrLDPCEncode` | LDPC encoding | ✅ `plc/trs/ldpc.py` |
+| `nrLDPCDecode` | LDPC decoding | ✅ `plc/trs/ldpc.py` |
+| `nrRateMatchLDPC` | Rate matching for LDPC encoded data | ✅ `plc/trs/ldpc.py` |
+| `nrRateRecoverLDPC` | Recover rate matched LDPC data | ✅ `plc/trs/ldpc.py` |
+| `nrCodeBlockSegmentLDPC` | Code block segmentation for LDPC coding | ✅ `plc/trs/ldpc.py` |
+| `nrCodeBlockDesegmentLDPC` | Code block desegmentation and CRC decoding | ✅ `plc/trs/ldpc.py` |
 
 #### Polar Coding
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPolarEncode` | Polar encoding | ✅ `transport_channel_subcomponents/` |
-| `nrPolarDecode` | Polar decoding | ✅ `transport_channel_subcomponents/` |
-| `nrRateMatchPolar` | Rate matching for Polar encoded data | ✅ `transport_channel_subcomponents/` |
-| `nrRateRecoverPolar` | Recover rate matched Polar data | ✅ `transport_channel_subcomponents/` |
+| `nrPolarEncode` | Polar encoding | ✅ `plc/trs/polar.py` |
+| `nrPolarDecode` | Polar decoding | ✅ `plc/trs/polar.py` |
+| `nrRateMatchPolar` | Rate matching for Polar encoded data | ✅ `plc/trs/polar.py` |
+| `nrRateRecoverPolar` | Recover rate matched Polar data | ✅ `plc/trs/polar.py` |
 
 #### Reference Functions
 
 | Function | Description | Status |
 |---|---|---|
-| `nrTBS` | Transport block size | ✅ `transport_channel_subcomponents/` |
+| `nrTBS` | Transport block size | ✅ `plc/trs/ref.py` |
 | `nrCQITables` | CQI mapping tables | ❌ |
-| `nrPDSCHMCSTables` | PDSCH MCS mapping tables | ✅ `transport_channel_subcomponents/` |
+| `nrPDSCHMCSTables` | PDSCH MCS mapping tables | ✅ `plc/trs/ref.py` |
 | `nrPUSCHMCSTables` | PUSCH MCS mapping tables | ❌ |
 
 ### Physical Channel and Signal Subcomponents
@@ -334,14 +334,14 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch; unl
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPRBS` | Generate PRBS | ✅ `physical_channel_and_signal_subcomponents/` |
+| `nrPRBS` | Generate PRBS | ✅ `plc/sym.py` |
 | `nrLowPAPRS` | Generate low peak-to-average power ratio (low-PAPR) sequence | ❌ |
-| `nrSymbolModulate` | Generate modulated symbols | ✅ `physical_channel_and_signal_subcomponents/` |
-| `nrSymbolDemodulate` | Demodulate and convert symbols to bits | ✅ `physical_channel_and_signal_subcomponents/` |
-| `nrLayerMap` | Layer mapping of modulated and scrambled codewords | ✅ `physical_channel_and_signal_subcomponents/` |
+| `nrSymbolModulate` | Generate modulated symbols | ✅ `plc/sym.py` |
+| `nrSymbolDemodulate` | Demodulate and convert symbols to bits | ✅ `plc/sym.py` |
+| `nrLayerMap` | Layer mapping of modulated and scrambled codewords | ✅ `plc/sym.py` |
 | `nrLayerDemap` | Layer demapping onto scrambled and modulated codewords | ❌ |
-| `nrTransformPrecode` | Generate transform precoded symbols | ✅ `physical_channel_and_signal_subcomponents/` |
-| `nrTransformDeprecode` | Recover transform deprecoded symbols | ✅ `physical_channel_and_signal_subcomponents/` |
+| `nrTransformPrecode` | Generate transform precoded symbols | ✅ `plc/sym.py` |
+| `nrTransformDeprecode` | Recover transform deprecoded symbols | ✅ `plc/sym.py` |
 
 ---
 
@@ -353,10 +353,10 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch)._
 |---|---|---|
 | `nrPerfectChannelEstimate` | Perfect channel estimation | ❌ |
 | `nrPerfectTimingEstimate` | Perfect timing estimation | ❌ |
-| `nrChannelEstimate` | Practical channel estimation | ✅ `signal_reception_and_recovery/` |
-| `nrTimingEstimate` | Practical timing estimation | ✅ `signal_reception_and_recovery/` |
-| `nrEqualizeMMSE` | Minimum mean-squared error (MMSE) equalization | ✅ `signal_reception_and_recovery/` |
-| `nrExtractResources` | Extract resource elements from resource array | ✅ `signal_reception_and_recovery/` |
+| `nrChannelEstimate` | Practical channel estimation | ✅ `rx.py` |
+| `nrTimingEstimate` | Practical timing estimation | ✅ `rx.py` |
+| `nrEqualizeMMSE` | Minimum mean-squared error (MMSE) equalization | ✅ `rx.py` |
+| `nrExtractResources` | Extract resource elements from resource array | ✅ `rx.py` |
 | `nrPhaseNoiseEstimate` | Estimate phase-noise-induced CPE | ❌ (only `tests/test_phase_compensation.py` exists, no library implementation) |
 | `nrPhaseNoiseCompensate` | Compensate phase-noise-induced CPE | ❌ (same — test exists, no library implementation) |
 
@@ -371,8 +371,8 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch)._
 | `nrCDLChannel` | Model CDL MIMO channel | ❌ |
 | `nrTDLChannel` | Model TDL MIMO channel model | ❌ |
 | `nrHSTChannel` | Model HST MIMO channel | ❌ |
-| `nrPathLossConfig` | Path loss configuration parameters | ✅ `configs/` |
-| `nrPathLoss` | Path loss and shadow fading between BS and UE | ✅ `signal_reception_and_recovery/` |
+| `nrPathLossConfig` | Path loss configuration parameters | ✅ `rx.py` |
+| `nrPathLoss` | Path loss and shadow fading between BS and UE | ✅ `rx.py` |
 
 ---
 
