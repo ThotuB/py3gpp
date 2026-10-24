@@ -21,6 +21,7 @@ from .dl.ofdm import (
     nrResourceGrid,
     nrSetResources,
 )
+from .dl.sig.csirs import nrCSIRS, nrCSIRSConfig, nrCSIRSIndices
 from .dl.sig.pbch_dmrs import nrPBCHDMRS, nrPBCHDMRSIndices
 from .dl.sig.pdsch_dmrs import nrPDSCHDMRS, nrPDSCHDMRSIndices
 from .dl.sig.pdsch_ptrs import nrPDSCHPTRS, nrPDSCHPTRSIndices
