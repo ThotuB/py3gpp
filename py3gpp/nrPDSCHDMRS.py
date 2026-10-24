@@ -1,6 +1,8 @@
 # 38.211
+from __future__ import annotations
 
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
@@ -8,7 +10,7 @@ from py3gpp.nrPRBS import nrPRBS
 from py3gpp.nrSymbolModulate import nrSymbolModulate
 
 
-def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig):
+def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig) -> NDArray[np.complex128]:
     if cfg.DMRS.DMRSConfigurationType == 1:
         n_dmrs_per_re = 6
     else:
@@ -37,7 +39,7 @@ def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig):
 
 
 # LUT for DMRS occupied symbols positions
-def PDSCHDMRSSyms(cfg: nrPDSCHConfig):
+def PDSCHDMRSSyms(cfg: nrPDSCHConfig) -> NDArray[np.int_]:
     assert cfg.MappingType in ["A"], "Mapping type B is not yet implemented"
     l1 = 11
     typeA_pos = cfg.DMRS.DMRSTypeAPosition
@@ -84,5 +86,5 @@ def PDSCHDMRSSyms(cfg: nrPDSCHConfig):
     return occupied_syms
 
 
-def PDSCHDMRScinit(sps, n_slot, n_symb, NIDSCID, n_scid):
+def PDSCHDMRScinit(sps: int, n_slot: int, n_symb: int, NIDSCID: int, n_scid: int) -> int:
     return 2**17 * (sps * n_slot + n_symb + 1) * (2 * NIDSCID + 1) + 2 * NIDSCID + n_scid

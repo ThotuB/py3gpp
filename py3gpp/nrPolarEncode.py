@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.helper import generate_5g_ranking, polar_precode_interleave
 
 
-def nrPolarEncode(payload, E, nmax=9, iil=False):
+def nrPolarEncode(payload: NDArray[np.int_], E: int, nmax: int = 9, iil: bool = False) -> NDArray[np.int_]:
     K = payload.shape[0]
     assert not (iil and K > 164), "iil is not supported for K > 164"
     _, info_pos = generate_5g_ranking(k=K, n=2**nmax)

@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
-from py3gpp.nrCRCEncode import nrCRCEncode
+from py3gpp.nrCRCEncode import CRCPoly, nrCRCEncode
 
 
-def _binToInt(bin):
+def _binToInt(bin: NDArray[np.int_]) -> int:
     integer = 0
     for bit in np.flip(bin):
         integer += bit
@@ -11,7 +14,7 @@ def _binToInt(bin):
     return integer
 
 
-def nrCRCDecode(blkcrc, poly, mask=0):
+def nrCRCDecode(blkcrc: NDArray[np.int_], poly: CRCPoly, mask: int = 0) -> tuple[NDArray[np.int_], int]:
     encoded = nrCRCEncode(blkcrc, poly, mask)
     L = len(encoded) - len(blkcrc)
     crc = encoded[-L:]

@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
 from py3gpp.nrPDSCHDMRS import PDSCHDMRSSyms
 
 
-def nrPDSCHIndices(carrier: nrCarrierConfig, pdsch: nrPDSCHConfig):
+def nrPDSCHIndices(carrier: nrCarrierConfig, pdsch: nrPDSCHConfig) -> NDArray[np.int_]:
     frame_begin = pdsch.NRBSize * (min(pdsch.PRBSet))
     frame_end = pdsch.NRBSize * (max(pdsch.PRBSet) + 1)
 

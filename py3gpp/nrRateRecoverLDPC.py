@@ -1,9 +1,24 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrDLSCHInfo import getZlist, nrDLSCHInfo
 
+Modulation = Literal["pi/2-BPSK", "BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]
 
-def nrRateRecoverLDPC(in_, trblklen, R, rv, mod, nLayers, numCB=None):
+
+def nrRateRecoverLDPC(
+    in_: NDArray[np.floating],
+    trblklen: int,
+    R: float,
+    rv: Literal[0, 1, 2, 3],
+    mod: Modulation,
+    nLayers: int,
+    numCB: int | None = None,
+) -> NDArray[np.floating]:
     assert (R > 0) and (R < 1), "R has to be 0 < R < 1"
     assert rv in [0, 1, 2, 3], "rv has to be in [0, 1, 2, 3]"
 
@@ -68,7 +83,9 @@ def nrRateRecoverLDPC(in_, trblklen, R, rv, mod, nLayers, numCB=None):
     return out
 
 
-def _rateRecover(in_, cbsinfo, k0, Ncb, Qm):
+def _rateRecover(
+    in_: NDArray[np.floating], cbsinfo: dict[str, int], k0: int, Ncb: int, Qm: int
+) -> NDArray[np.floating]:
     # perform deinterleaving according to section 5.4.2.2
     E = len(in_)
     in_ = np.reshape(in_, (int(E / Qm), Qm)).ravel("F")

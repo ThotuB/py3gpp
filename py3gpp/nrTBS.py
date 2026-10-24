@@ -1,10 +1,20 @@
 # Ref: https://ch.mathworks.com/help/5g/ref/nrtbs.html#d124e53763
 # Ref: TS 38.214 Sections 5.1.3.2
+from __future__ import annotations
 
 import numpy as np
+from numpy.typing import NDArray
 
 
-def nrTBS(mod, nlayers, nPRB, NREPerPRB, tcr, xOh=0, tbScaling=1):
+def nrTBS(
+    mod: str | list[str] | tuple[str, ...],
+    nlayers: int,
+    nPRB: int,
+    NREPerPRB: int,
+    tcr: float | list[float] | tuple[float, ...],
+    xOh: int = 0,
+    tbScaling: float | list[float] | tuple[float, float] = 1,
+) -> int | NDArray[np.int_]:
 
     ### Pre-defined table ###
 

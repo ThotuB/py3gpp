@@ -1,10 +1,14 @@
 # Ref: https://www.mathworks.com/help/5g/ref/nrlayermap.html
 # Ref: TS 38.211 Sections 7.3.1.3
+from __future__ import annotations
 
 import numpy as np
+from numpy.typing import NDArray
 
 
-def nrLayerMap(in_symbols, nLayers):
+def nrLayerMap(
+    in_symbols: NDArray[np.complexfloating] | list[NDArray[np.complexfloating]], nLayers: int
+) -> NDArray[np.float64]:
 
     # Check number of modulation symbols from either one or two codewords
     if isinstance(in_symbols, np.ndarray):

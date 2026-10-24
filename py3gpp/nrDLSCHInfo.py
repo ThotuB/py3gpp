@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+from typing import Any, Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 
-def nrDLSCHInfo(tbs, tcr):
+def nrDLSCHInfo(tbs: int | None, tcr: float) -> dict[str, Any]:
     assert tbs >= 0
     assert type(tbs) == int
     assert tcr > 0 and tcr < 1
@@ -38,7 +43,7 @@ def nrDLSCHInfo(tbs, tcr):
     return info
 
 
-def getBGNInfo(A, R):
+def getBGNInfo(A: int, R: float) -> dict[str, Any]:
     if A <= 292 or (A <= 3824 and R <= 0.67) or R <= 0.25:
         bgn = 2
     else:
@@ -60,7 +65,7 @@ def getBGNInfo(A, R):
     return info
 
 
-def getZarray():
+def getZarray() -> list[list[int]]:
     Zarray = [
         [2, 4, 8, 16, 32, 64, 128, 256],
         [3, 6, 12, 24, 48, 96, 192, 384],
@@ -74,7 +79,7 @@ def getZarray():
     return Zarray
 
 
-def getZlist():
+def getZlist() -> NDArray[np.int_]:
     # Zlist = [2:16 18:2:32 36:4:64 72:8:128 144:16:256 288:32:384];
     Zlist = []
     Zlist += list(range(2, 17))
@@ -86,7 +91,7 @@ def getZlist():
     return np.array(Zlist).astype(int)
 
 
-def getCBSInfo(B, bgn):
+def getCBSInfo(B: int, bgn: Literal[1, 2]) -> dict[str, Any]:
     if bgn == 1:
         Kcb = 8448
     else:

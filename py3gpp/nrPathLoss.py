@@ -1,12 +1,20 @@
 # Ref: https://www.mathworks.com/help/5g/ref/nrpathloss.html#d124e18391
 # Ref: TR 38.901 Section 7.4.1
+from __future__ import annotations
 
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.configs.nrPathLossConfig import nrPathLossConfig
 
 
-def nrPathLoss(pathlossconf, freq, los, bs, ue):
+def nrPathLoss(
+    pathlossconf: nrPathLossConfig,
+    freq: int | float,
+    los: bool | int | NDArray[np.bool_],
+    bs: NDArray[np.floating],
+    ue: NDArray[np.floating],
+) -> tuple[float, float]:
 
     # Check the input types
     if not isinstance(freq, (int, float)):

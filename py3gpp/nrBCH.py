@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrCRCEncode import nrCRCEncode
 from py3gpp.nrPBCHPRBS import nrPBCHPRBS
@@ -6,7 +9,7 @@ from py3gpp.nrPolarEncode import nrPolarEncode
 from py3gpp.nrRateMatchPolar import nrRateMatchPolar
 
 
-def nrBCH(trblk, sfn, hrf, lssb, idxoffset, ncellid):
+def nrBCH(trblk: NDArray[np.int_], sfn: int, hrf: int, lssb: int, idxoffset: int, ncellid: int) -> NDArray[np.int_]:
     # interleaving according to TS38.212 7.1.1
     # fmt: off
     G = [16, 23, 18, 17, 8, 30, 10, 6, 24, 7, 0, 5, 3, 2, 1, 4, 9, 11, 12, 13, 14, 15, 19, 20, 21, 22, 25, 26, 27, 28,

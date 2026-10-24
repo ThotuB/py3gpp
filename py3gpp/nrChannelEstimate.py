@@ -1,10 +1,20 @@
+from __future__ import annotations
+
 import numpy as np
 import scipy
+from numpy.typing import NDArray
 
 from py3gpp import nrSetResources
+from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 
 
-def nrChannelEstimate(rxGrid=None, refInd=None, refSym=None, refGrid=None, carrier=None):
+def nrChannelEstimate(
+    rxGrid: NDArray[np.complexfloating] | None = None,
+    refInd: NDArray[np.int_] | None = None,
+    refSym: NDArray[np.complexfloating] | None = None,
+    refGrid: NDArray[np.complexfloating] | None = None,
+    carrier: nrCarrierConfig | None = None,
+) -> tuple[NDArray[np.complexfloating], float] | None:
     cp = "normal" if carrier is None else "extended"
     if refGrid is None:
         if (refInd is None) or (refSym is None):

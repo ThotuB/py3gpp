@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
 import scipy as sp
 from importlib_resources import as_file, files  # importlib.resources only works for Python >= 3.9
+from numpy.typing import NDArray
 
 from py3gpp import codes
 from py3gpp.nrDLSCHInfo import getZarray, getZlist
 
 
 # This function is from Sionna
-def _load_basegraph(i_ls, bgn):
+def _load_basegraph(i_ls: int, bgn: int) -> NDArray[np.float64]:
     if i_ls > 7:
         raise ValueError("i_ls too large.")
 
@@ -41,7 +46,7 @@ def _load_basegraph(i_ls, bgn):
 
 
 # This function is from Sionna
-def _lift_basegraph(bm, z):
+def _lift_basegraph(bm: NDArray[np.float64], z: int) -> sp.sparse.csr_matrix:
     """Lift basegraph with lifting factor ``z`` and shifted identities as
     defined by the entries of ``bm``."""
 
@@ -74,7 +79,9 @@ def _lift_basegraph(bm, z):
 
 
 # This function is from Sionna
-def _gen_submat(bm, k_b, z, bgn):
+def _gen_submat(
+    bm: NDArray[np.float64], k_b: int, z: int, bgn: int
+) -> tuple[sp.sparse.csr_matrix, sp.sparse.csr_matrix, sp.sparse.csr_matrix, sp.sparse.csr_matrix]:
     """Split the basegraph into multiple sub-matrices such that efficient
     encoding is possible.
     """
@@ -101,7 +108,7 @@ def _gen_submat(bm, k_b, z, bgn):
 
 
 # This function is from Sionna
-def _find_hm_b_inv(bm_b, z, bgn):
+def _find_hm_b_inv(bm_b: NDArray[np.float64], z: int, bgn: int) -> sp.sparse.csr_matrix:
     """For encoding we need to find the inverse of `hm_b` such that
     `hm_b^-1 * hm_b = I`.
 
@@ -190,7 +197,13 @@ def _find_hm_b_inv(bm_b, z, bgn):
     return sp.sparse.csr_matrix(hm_b_inv)
 
 
-def _encode(s, pcm_a, pcm_b_inv, pcm_c1, pcm_c2):
+def _encode(
+    s: NDArray[np.floating],
+    pcm_a: sp.sparse.csr_matrix,
+    pcm_b_inv: sp.sparse.csr_matrix,
+    pcm_c1: sp.sparse.csr_matrix,
+    pcm_c2: sp.sparse.csr_matrix,
+) -> NDArray[np.uint8]:
     p_a = pcm_a * s
     p_a = pcm_b_inv * p_a
 
@@ -207,7 +220,7 @@ def _encode(s, pcm_a, pcm_b_inv, pcm_c1, pcm_c2):
     return c
 
 
-def _mul_sh(x, k):
+def _mul_sh(x: NDArray[np.floating], k: int) -> NDArray[np.floating]:
     if k == -1:
         return np.zeros(len(x))
     return np.roll(x, -int(k))
@@ -216,7 +229,7 @@ def _mul_sh(x, k):
 # this is like shown by Prof. Thangaraj in this video
 # https://www.youtube.com/watch?v=QJwQi06Fm3M
 # this is also how it would be done in hardware
-def _encode_thangaraj(B, Zc, msg):
+def _encode_thangaraj(B: NDArray[np.float64], Zc: int, msg: NDArray[np.floating]) -> NDArray[np.floating]:
     M, N = B.shape
     cw = np.zeros(N * Zc)
     cw[: (N - M) * Zc] = msg  # it's a systematic code
@@ -246,7 +259,9 @@ def _encode_thangaraj(B, Zc, msg):
     return cw
 
 
-def nrLDPCEncode(cbs, bgn, algo="sionna"):
+def nrLDPCEncode(
+    cbs: NDArray[np.floating], bgn: int, algo: Literal["sionna", "thangaraj"] = "sionna"
+) -> NDArray[np.int8]:
     cbs = cbs.copy()  # don't modify inputs
 
     if algo not in ["sionna", "thangaraj"]:
@@ -335,7 +350,7 @@ def nrLDPCEncode(cbs, bgn, algo="sionna"):
     return codedcbs
 
 
-def _check_cw(B, Zc, cw):
+def _check_cw(B: NDArray[np.float64], Zc: int, cw: NDArray[np.floating]) -> bool:
     M, N = B.shape
     syn = np.zeros(M * Zc)
     for i in range(M):

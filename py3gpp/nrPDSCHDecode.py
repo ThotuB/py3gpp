@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrPRBS import nrPRBS
 from py3gpp.nrSymbolDemodulate import nrSymbolDemodulate
 
 
-def nrPDSCHDecode(sym, mod, nid, rnti):
+def nrPDSCHDecode(sym: NDArray[np.complex128], mod: list[str], nid: int, rnti: int) -> NDArray[np.float64]:
     descrambled_bits = []
     n_layers = sym.shape[0]
     if n_layers != 1:

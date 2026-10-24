@@ -1,20 +1,23 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.helper import _calc_m_seq
 
 
-def nrSSSm0(ncellid):
+def nrSSSm0(ncellid: int) -> int:
     n1 = ncellid // 3
     n2 = ncellid % 3
     return 15 * (n1 // 112) + 5 * n2
 
 
-def nrSSSm1(ncellid):
+def nrSSSm1(ncellid: int) -> int:
     n1 = ncellid // 3
     return n1 % 112
 
 
-def _gold(ncellid):
+def _gold(ncellid: int) -> NDArray[np.int_]:
     N = 7
     c = [1, 0, 0, 0, 0, 0, 0]
     taps_0 = [0, 4]
@@ -27,6 +30,6 @@ def _gold(ncellid):
     return d_SSS
 
 
-def nrSSS(ncellid):
+def nrSSS(ncellid: int) -> NDArray[np.int_]:
     assert ncellid >= 0 and ncellid <= 1007, "invalid ncellid"
     return _gold(ncellid)

@@ -1,12 +1,14 @@
 # 38.211 7.4.3 SS/PBCH block
+from __future__ import annotations
 
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrPBCHPRBS import nrPBCHPRBS
 from py3gpp.nrSymbolModulate import nrSymbolModulate
 
 
-def nrPBCH(ncellid, v, databits):
+def nrPBCH(ncellid: int, v: int, databits: NDArray[np.int_]) -> NDArray[np.complex128]:
     n = len(databits)
 
     assert ncellid <= 1007 and ncellid >= 0

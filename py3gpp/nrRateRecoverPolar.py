@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 
-def subblock_interleaving(u):
+def subblock_interleaving(u: NDArray[np.int_]) -> NDArray[np.int_]:
     N = u.shape[-1]
     assert np.mod(N, 32) == 0, "length for sub-block interleaving must be a multiple of 32."
     y = np.zeros_like(u)
@@ -54,7 +57,9 @@ def subblock_interleaving(u):
 # nrRateRecoverPolar() in Matlab discards all repeated llr values,
 # this is not optimal but we make this function behave the same by default
 # optimal behaviour can be switched on by setting discardRepetition to False
-def nrRateRecoverPolar(llr, K, N, ibil=False, discardRepetition=True):
+def nrRateRecoverPolar(
+    llr: NDArray[np.floating], K: int, N: int, ibil: bool = False, discardRepetition: bool = True
+) -> NDArray[np.floating]:
     E = llr.shape[0]
     if N <= E:
         # undo repetition

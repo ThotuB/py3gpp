@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 
-def _calc_m_seq(N, c, taps, seq_len=None):
+def _calc_m_seq(
+    N: int, c: NDArray[np.floating] | list[int], taps: list[int], seq_len: int | None = None
+) -> NDArray[np.int32]:
     if seq_len is None:
         seq_len = 2**N - 1
     m = np.zeros(seq_len, "int32")  # m-sequence
@@ -13,7 +18,7 @@ def _calc_m_seq(N, c, taps, seq_len=None):
 
 
 # TS 38.211 Section 5.2.1
-def _calc_gold(c_init, length):
+def _calc_gold(c_init: int, length: int) -> NDArray[np.int32]:
     N = 31
 
     c_0 = np.zeros(N)
@@ -83,7 +88,7 @@ frozen_pos_table = np.array([0, 1, 2, 4, 8, 16, 32, 3, 5, 64, 9, 6, 17, 10, 18, 
 
 # modified from sionna
 # https://github.com/NVlabs/sionna/blob/main/sionna/fec/polar/utils.py
-def generate_5g_ranking(k, n, sort=True):
+def generate_5g_ranking(k: int, n: int, sort: bool = True) -> list[NDArray[np.int_]]:
     """Returns information and frozen bit positions of the 5G Polar code
     as defined in Tab. 5.3.1.2-1 in [3GPPTS38212]_ for given values of ``k``
     and ``n``.
@@ -154,7 +159,7 @@ def generate_5g_ranking(k, n, sort=True):
     return [frozen_pos, info_pos]
 
 
-def polar_precode_interleave(K):
+def polar_precode_interleave(K: int) -> NDArray[np.int_]:
     # 38.212 Table 5.3.1.1-1
     # fmt: off
     p_IL_max_table = [0, 2, 4, 7, 9, 14, 19, 20, 24, 25, 26, 28, 31, 34, 42, 45, 49, 50, 51, 53, 54, 56, 58, 59, 61,

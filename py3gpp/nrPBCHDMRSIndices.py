@@ -1,7 +1,14 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 
-def nrPBCHDMRSIndices(ncellid, style="matlab"):
+def nrPBCHDMRSIndices(
+    ncellid: int, style: Literal["python", "matlab"] = "matlab"
+) -> tuple[tuple[int, ...], tuple[int, ...]] | NDArray[np.int_]:
     indices_sym1_3 = np.arange(ncellid % 4, 240, 4)
     indices_sym2 = np.concatenate((np.arange(ncellid % 4, 48, 4), np.arange(192 + ncellid % 4, 240, 4)))
     if style == "python":

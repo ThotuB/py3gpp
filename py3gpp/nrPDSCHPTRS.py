@@ -1,6 +1,10 @@
 # 38.211
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
@@ -9,7 +13,7 @@ from py3gpp.nrPRBS import nrPRBS
 from py3gpp.nrSymbolModulate import nrSymbolModulate
 
 
-def nrPDSCHPTRS(carrier: nrCarrierConfig, cfg: nrPDSCHConfig):
+def nrPDSCHPTRS(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> list | NDArray[np.complex128]:
     if cfg.EnablePTRS == 0:
         return []
 
@@ -32,7 +36,7 @@ def nrPDSCHPTRS(carrier: nrCarrierConfig, cfg: nrPDSCHConfig):
     return np.tile(ptrs_sym, len(ptrs_occupied_syms))
 
 
-def PTRSPRBSet(cfg: nrPDSCHConfig):
+def PTRSPRBSet(cfg: nrPDSCHConfig) -> NDArray[Any]:
     # Align with frequency offset based on DMRS type
     if cfg.DMRS.DMRSConfigurationType == 1:
         dmrs_ref_table = np.array([0, 2, 6, 8])
@@ -59,7 +63,7 @@ def PTRSPRBSet(cfg: nrPDSCHConfig):
 
 
 # LUT for PTRS occupied symbols positions
-def PDSCHPTRSSyms(carrier: nrCarrierConfig, cfg: nrPDSCHConfig):
+def PDSCHPTRSSyms(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> NDArray[np.int_]:
     # First get DMRS symbols
     dmrs_syms = PDSCHDMRSSyms(cfg)
     # Then calculate positions of PTRS
@@ -86,5 +90,5 @@ def PDSCHPTRSSyms(carrier: nrCarrierConfig, cfg: nrPDSCHConfig):
     return occupied_syms
 
 
-def PDSCHPTRScinit(sps, n_slot, n_symb, NIDSCID, n_scid):
+def PDSCHPTRScinit(sps: int, n_slot: int, n_symb: int, NIDSCID: int, n_scid: int) -> int:
     return 2**17 * (sps * n_slot + n_symb + 1) * (2 * NIDSCID + 1) + 2 * NIDSCID + n_scid

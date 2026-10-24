@@ -1,13 +1,17 @@
 # 38.211
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
 from py3gpp.nrPDSCHPTRS import PDSCHPTRSSyms
 
 
-def nrPDSCHPTRSIndices(carrier: nrCarrierConfig, cfg: nrPDSCHConfig):
+def nrPDSCHPTRSIndices(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> NDArray[Any]:
     if cfg.EnablePTRS == 0:
         return np.array([])
 

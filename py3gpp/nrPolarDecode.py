@@ -1,10 +1,15 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.helper import generate_5g_ranking, polar_precode_interleave
 
 
 # very simple successive cancellation decoder
-def Polar_SC_decoder(N, frozen_pos, r):
+def Polar_SC_decoder(N: int, frozen_pos: NDArray[np.int_], r: NDArray[np.floating]) -> NDArray[np.int_]:
     n = np.log2(N).astype(int)
     L = np.zeros((n + 1, N))
     ucap = np.zeros((n + 1, N))
@@ -60,7 +65,16 @@ def Polar_SC_decoder(N, frozen_pos, r):
 # E: rate-matched output length in bits
 # L: length of decoding list
 # CRClen: number of appended CRC bits
-def nrPolarDecode(rec, K, E, L, padCRC=False, nmax=9, iil=True, CRClen=24):
+def nrPolarDecode(
+    rec: NDArray[np.floating],
+    K: int,
+    E: int,
+    L: int,
+    padCRC: bool = False,
+    nmax: Literal[9, 10] = 9,
+    iil: bool = True,
+    CRClen: Literal[6, 11, 24] = 24,
+) -> NDArray[np.int_]:
     if CRClen not in (6, 11, 24):
         print("Error: invalid CRClen value!")
         exit()

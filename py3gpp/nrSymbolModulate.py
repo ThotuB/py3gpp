@@ -1,9 +1,11 @@
 # 38.211 5.1 Modulation mapper
+from __future__ import annotations
 
 import numpy as np
+from numpy.typing import NDArray
 
 
-def nrSymbolModulate(databits, modulation):
+def nrSymbolModulate(databits: NDArray[np.int_], modulation: str) -> NDArray[np.complex128]:
     int_modtype = modulation.lower()
 
     assert int_modtype in ["pi/2-bpsk", "bpsk", "qpsk", "16qam", "64qam", "256qam"], "modulation type is incorrect"

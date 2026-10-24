@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 
 # 16QAM constellation:
@@ -8,7 +13,7 @@ import numpy as np
 # ---------------------------------> I
 #  1110    1100  |   0100  0110
 #  1111    1101  |   0101  0111
-def _16QAM_table():
+def _16QAM_table() -> NDArray[np.complex128]:
     table = np.empty(16, "complex")
     QAM16_LEVEL_1 = 1 / np.sqrt(10)
     QAM16_LEVEL_2 = 3 / np.sqrt(10)
@@ -31,7 +36,12 @@ def _16QAM_table():
     return table
 
 
-def nrSymbolDemodulate(input, mod, nVar=1e-10, DecisionType="soft"):
+def nrSymbolDemodulate(
+    input: NDArray[np.complex128],
+    mod: Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"],
+    nVar: float = 1e-10,
+    DecisionType: Literal["soft", "hard"] = "soft",
+) -> NDArray[np.floating] | NDArray[np.integer]:
     r_i = np.real(input)
     r_q = np.imag(input)
     if mod == "BPSK":

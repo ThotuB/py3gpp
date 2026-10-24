@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrCRCDecode import nrCRCDecode
 from py3gpp.nrPBCHPRBS import nrPBCHPRBS
@@ -6,7 +9,9 @@ from py3gpp.nrPolarDecode import nrPolarDecode
 from py3gpp.nrRateRecoverPolar import nrRateRecoverPolar
 
 
-def nrBCHDecode(softbits, L, lssb=None, ncellid=None):
+def nrBCHDecode(
+    softbits: NDArray[np.float64], L: int, lssb: int | None = None, ncellid: int | None = None
+) -> tuple[NDArray[np.int_], int] | tuple[NDArray[np.int_], int, NDArray[np.int_], NDArray[np.int_], int, int]:
     K = 32 + 24
     E = 864
     L = 8

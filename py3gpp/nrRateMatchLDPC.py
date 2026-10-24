@@ -1,9 +1,18 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrDLSCHInfo import getZlist
 
+Modulation = Literal["pi/2-BPSK", "BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]
 
-def nrRateMatchLDPC(in_, outlen, rv, mod, nLayers):
+
+def nrRateMatchLDPC(
+    in_: NDArray[np.int_], outlen: int, rv: Literal[0, 1, 2, 3], mod: Modulation, nLayers: Literal[1, 2, 3, 4]
+) -> NDArray[np.int_]:
     assert rv in [0, 1, 2, 3], "rv has to be in [0, 1, 2, 3]"
     assert nLayers in [1, 2, 3, 4], "nLayers has to be [1, 2, 3, 4]"
     if mod in ["pi/2-BPSK", "BPSK"]:
@@ -63,7 +72,7 @@ def nrRateMatchLDPC(in_, outlen, rv, mod, nLayers):
     return rematched
 
 
-def _rateMatch(d, E, k0, Ncb, Qm):
+def _rateMatch(d: NDArray[np.int_], E: int, k0: int, Ncb: int, Qm: int) -> NDArray[np.int_]:
     # E is number of bits after rate matching
     N_filler_bits = np.count_nonzero(d[:Ncb, 0] == -1, axis=0)
 

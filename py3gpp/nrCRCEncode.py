@@ -1,7 +1,14 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
+
+CRCPoly = Literal["6", "11", "16", "24A", "24B", "24C"]
 
 
-def nrCRCEncode(blk, poly, mask=0):
+def nrCRCEncode(blk: NDArray[np.int_], poly: CRCPoly, mask: int = 0) -> NDArray[np.int_]:
     if len(blk.shape) == 1:
         blk = np.expand_dims(blk, axis=1)
     if poly == "6":

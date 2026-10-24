@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 from .helper import _calc_m_seq
 
 
 # TS 38.211 Section 5.2.1
-def nrPRBS(c_init, length):
+def nrPRBS(c_init: int, length: int) -> NDArray[np.int32]:
     assert length > 0
 
     N = 31

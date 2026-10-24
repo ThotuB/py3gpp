@@ -1,10 +1,15 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrCRCEncode import nrCRCEncode
 from py3gpp.nrDLSCHInfo import getCBSInfo
 
 
-def nrCodeBlockSegmentLDPC(blk, bgn):
+def nrCodeBlockSegmentLDPC(blk: NDArray[np.int_], bgn: Literal[1, 2]) -> NDArray[np.int_]:
     assert bgn in [1, 2], "bgn must be in [1, 2]"
     cbsInfo = getCBSInfo(len(blk), bgn)
     assert cbsInfo["Lcb"] in [0, 24], f'Error: Lcb = {cbsInfo["Lcb"]} is not supported!'

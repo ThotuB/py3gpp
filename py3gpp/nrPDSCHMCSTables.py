@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 
-def qm_to_mod(qm):
+def qm_to_mod(qm: int) -> Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]:
     if qm == 1:
         return "BPSK"
     if qm == 2:
@@ -17,8 +22,8 @@ def qm_to_mod(qm):
 
 
 class qam64_table:
-    def __init__(self):
-        self._table = np.zeros((4, 29), int)
+    def __init__(self) -> None:
+        self._table: NDArray[np.int_] = np.zeros((4, 29), int)
         self._table[0, :] = np.arange(self._table.shape[1])
         self._table[1, :] = np.array(
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
@@ -90,22 +95,22 @@ class qam64_table:
             ]
         )
 
-    def Qm(self, mcs):
+    def Qm(self, mcs: int) -> int:
         return self._table[1, mcs]
 
-    def Modulation(self, mcs):
+    def Modulation(self, mcs: int) -> Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]:
         return qm_to_mod(self._table[1, mcs])
 
-    def Rate(self, mcs):
+    def Rate(self, mcs: int) -> float:
         return self._table[2, mcs] / 1024
 
-    def SpectralEfficiency(self, mcs):
+    def SpectralEfficiency(self, mcs: int) -> float:
         return self._table[3, mcs]
 
 
 class qam64lowse_table:
-    def __init__(self):
-        self._table = np.zeros((4, 29), int)
+    def __init__(self) -> None:
+        self._table: NDArray[np.int_] = np.zeros((4, 29), int)
         self._table[0, :] = np.arange(self._table.shape[1])
         self._table[1, :] = np.array(
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6]
@@ -177,22 +182,22 @@ class qam64lowse_table:
             ]
         )
 
-    def Qm(self, mcs):
+    def Qm(self, mcs: int) -> int:
         return self._table[1, mcs]
 
-    def Modulation(self, mcs):
+    def Modulation(self, mcs: int) -> Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]:
         return qm_to_mod(self._table[1, mcs])
 
-    def Rate(self, mcs):
+    def Rate(self, mcs: int) -> float:
         return self._table[2, mcs] / 1024
 
-    def SpectralEfficiency(self, mcs):
+    def SpectralEfficiency(self, mcs: int) -> float:
         return self._table[3, mcs]
 
 
 class qam256_table:
-    def __init__(self):
-        self._table = np.zeros((4, 28), int)
+    def __init__(self) -> None:
+        self._table: NDArray[np.int_] = np.zeros((4, 28), int)
         self._table[0, :] = np.arange(self._table.shape[1])
         self._table[1, :] = np.array(
             [2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 8, 8]
@@ -262,27 +267,27 @@ class qam256_table:
             ]
         )
 
-    def Qm(self, mcs):
+    def Qm(self, mcs: int) -> int:
         return self._table[1, mcs]
 
-    def Modulation(self, mcs):
+    def Modulation(self, mcs: int) -> Literal["BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]:
         return qm_to_mod(self._table[1, mcs])
 
-    def Rate(self, mcs):
+    def Rate(self, mcs: int) -> float:
         return self._table[2, mcs] / 1024
 
-    def SpectralEfficiency(self, mcs):
+    def SpectralEfficiency(self, mcs: int) -> float:
         return self._table[3, mcs]
 
 
 class pdsch_mcs_table_class:
-    def __init__(self):
-        self.QAM64Table = qam64_table()
-        self.QAM64LowSETable = qam64lowse_table()
-        self.QAM256Table = qam256_table()
+    def __init__(self) -> None:
+        self.QAM64Table: qam64_table = qam64_table()
+        self.QAM64LowSETable: qam64lowse_table = qam64lowse_table()
+        self.QAM256Table: qam256_table = qam256_table()
 
 
-def nrPDSCHMCSTables():
+def nrPDSCHMCSTables() -> pdsch_mcs_table_class:
     return pdsch_mcs_table_class()
 
 

@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+from typing import Any, Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.nrOFDMInfo import nrOFDMInfo
@@ -6,16 +11,16 @@ from py3gpp.nrOFDMInfo import nrOFDMInfo
 
 # TODO: implement windowing
 def nrOFDMModulate(
-    carrier=None,
-    grid=None,
-    scs=None,
-    initialNSlot=None,
-    CyclicPrefix="normal",
-    Nfft=None,
-    SampleRate=None,
-    Windowing=None,
-    CarrierFrequency=0,
-):
+    carrier: nrCarrierConfig | None = None,
+    grid: NDArray[np.complexfloating] | None = None,
+    scs: int | None = None,
+    initialNSlot: int | None = None,
+    CyclicPrefix: Literal["normal", "extended"] = "normal",
+    Nfft: int | None = None,
+    SampleRate: int | None = None,
+    Windowing: Any | None = None,
+    CarrierFrequency: float = 0,
+) -> list | None:
     info = {}
 
     if carrier is None:

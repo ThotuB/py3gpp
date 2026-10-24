@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 
-def subblock_interleaving(u):
+def subblock_interleaving(u: NDArray[np.int_]) -> NDArray[np.int_]:
     N = u.shape[-1]
     assert np.mod(N, 32) == 0, "length for sub-block interleaving must be a multiple of 32."
     y = np.zeros_like(u)
@@ -51,7 +54,7 @@ def subblock_interleaving(u):
     return y
 
 
-def nrRateMatchPolar(enc, K, E, ibil=False):
+def nrRateMatchPolar(enc: NDArray[np.int_], K: int, E: int, ibil: bool = False) -> NDArray[np.int_]:
     # TODO: for what is the parameter K??
     N = enc.shape[0]
     d = np.zeros(N, int)

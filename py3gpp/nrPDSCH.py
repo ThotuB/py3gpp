@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrPRBS import nrPRBS
 from py3gpp.nrSymbolModulate import nrSymbolModulate
 
 
-def nrPDSCH(cws, modulation, nlayers, nid, nrnti):
+def nrPDSCH(
+    cws: list[NDArray[np.int_]], modulation: list[str], nlayers: int, nid: int, nrnti: int
+) -> NDArray[np.complex128]:
     if nlayers != 1:
         raise NotImplementedError("not ready yet")
     assert nlayers in list(range(1, 9))

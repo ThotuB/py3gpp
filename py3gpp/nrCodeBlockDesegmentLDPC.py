@@ -1,10 +1,17 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
+from numpy.typing import NDArray
 
 from py3gpp.nrCRCDecode import nrCRCDecode
 from py3gpp.nrDLSCHInfo import getCBSInfo
 
 
-def nrCodeBlockDesegmentLDPC(cbs, bgn, blklen):
+def nrCodeBlockDesegmentLDPC(
+    cbs: NDArray[np.int_], bgn: Literal[1, 2], blklen: int
+) -> tuple[NDArray[np.floating], bool]:
     assert len(cbs.shape) == 2
     blk = None
     err = False

@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+from typing import Literal
+
 import numpy as np
 import scipy as sp
 from importlib_resources import as_file, files  # importlib.resources only works for Python >= 3.9
+from numpy.typing import NDArray
 
 from py3gpp import codes
 from py3gpp.nrDLSCHInfo import getZarray, getZlist
@@ -8,15 +13,17 @@ from py3gpp.nrLDPCEncode import _lift_basegraph, _load_basegraph, _mul_sh
 
 
 def nrLDPCDecode(
-    in_,
-    bgn,
-    maxNumIter,
-    Algorithm="Layered belief propagation",
-    ScalingFactor=0.75,
-    Offset=0.5,
-    vectorize=True,
-    verbose=False,
-):
+    in_: NDArray[np.floating],
+    bgn: int,
+    maxNumIter: int,
+    Algorithm: Literal["Layered belief propagation", "Normalized min-sum", "Offset min-sum"] = (
+        "Layered belief propagation"
+    ),
+    ScalingFactor: float = 0.75,
+    Offset: float = 0.5,
+    vectorize: bool = True,
+    verbose: bool = False,
+) -> tuple[NDArray[np.uint8], int]:
     if Algorithm not in ["Layered belief propagation", "Normalized min-sum", "Offset min-sum"]:
         raise ValueError(f"Algorithm {Algorithm} is not supported")
     if len(in_.shape) != 2:
