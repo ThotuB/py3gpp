@@ -12,6 +12,7 @@ py3gpp = ["codes/*.csv"]
 version = "0.6.0"
 authors = [
     {name = "Benjamin Menküc", email = "benjamin@menkuec.de"},
+    {name = "Tatu Bogdan", email = "bogdantatu10@gmail.com"},
 ]
 description = "Functions for 5G NR signal processing"
 name = "py3gpp"
@@ -34,4 +35,4 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/catkira/py3gpp"
+"Homepage" = "https://github.com/ThotuB/py3gpp"
