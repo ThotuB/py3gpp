@@ -3,8 +3,8 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrPRBS import nrPRBS
-from py3gpp.nrSymbolDemodulate import nrSymbolDemodulate
+from py3gpp.physical_channel_and_signal_subcomponents.nrPRBS import nrPRBS
+from py3gpp.physical_channel_and_signal_subcomponents.nrSymbolDemodulate import nrSymbolDemodulate
 
 
 def nrPDSCHDecode(sym: NDArray[np.complex128], mod: list[str], nid: int, rnti: int) -> NDArray[np.float64]:
@@ -30,6 +30,6 @@ if __name__ == "__main__":
     data = np.random.randint(0, 2, size=(1, 8000))
     import py3gpp
 
-    txsym = py3gpp.nrPDSCH(data, modulation, nlayers, ncellid, rnti)
+    txsym = py3gpp.downlink_physical_channels.nrPDSCH(data, modulation, nlayers, ncellid, rnti)
     rxbits = nrPDSCHDecode(txsym, modulation, ncellid, rnti)
     assert np.array_equal(data, np.round(rxbits < 0).astype(int))

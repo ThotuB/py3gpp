@@ -4,7 +4,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.nrSymbolModulate import nrSymbolModulate
+from py3gpp.physical_channel_and_signal_subcomponents.nrSymbolModulate import nrSymbolModulate
 
 
 def get_bin_symbols(bps, symbols):

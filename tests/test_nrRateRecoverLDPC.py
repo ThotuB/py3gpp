@@ -1,7 +1,7 @@
 import numpy as np
 import test_data.ldpc
 
-from py3gpp.nrRateRecoverLDPC import nrRateRecoverLDPC
+from py3gpp.transport_channel_subcomponents.nrRateRecoverLDPC import nrRateRecoverLDPC
 
 
 def test_nrRateRecoverLDPC():

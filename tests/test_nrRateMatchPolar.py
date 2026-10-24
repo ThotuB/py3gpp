@@ -1,6 +1,6 @@
 import numpy as np
 
-from py3gpp.nrRateMatchPolar import nrRateMatchPolar
+from py3gpp.transport_channel_subcomponents.nrRateMatchPolar import nrRateMatchPolar
 
 
 def test_nrRateMatchPolar():

@@ -7,8 +7,8 @@ import pytest
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.nrPDSCHPTRS import PDSCHPTRSSyms
-from py3gpp.nrPDSCHPTRSIndices import nrPDSCHPTRSIndices
+from py3gpp.downlink_physical_signals.nrPDSCHPTRS import PDSCHPTRSSyms
+from py3gpp.downlink_physical_signals.nrPDSCHPTRSIndices import nrPDSCHPTRSIndices
 
 sys.path.append("test_data")
 from test_data.pdsch import pdschptrs_indices_ref

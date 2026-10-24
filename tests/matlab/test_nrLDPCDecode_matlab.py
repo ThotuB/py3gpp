@@ -2,7 +2,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.nrLDPCDecode import nrLDPCDecode
+from py3gpp.transport_channel_subcomponents.nrLDPCDecode import nrLDPCDecode
 
 
 @pytest.fixture(scope="session")

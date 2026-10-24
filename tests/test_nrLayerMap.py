@@ -1,6 +1,6 @@
 import numpy as np
 
-from py3gpp.nrLayerMap import nrLayerMap
+from py3gpp.physical_channel_and_signal_subcomponents.nrLayerMap import nrLayerMap
 
 
 def test_nrLayerMap_one_codeword_array():

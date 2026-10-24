@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-from .helper import _calc_m_seq
+from ..helper import _calc_m_seq
 
 
 # TS 38.211 Section 5.2.1

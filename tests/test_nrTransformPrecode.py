@@ -3,8 +3,8 @@ import sys
 import numpy as np
 import pytest
 
-from py3gpp.nrSymbolModulate import nrSymbolModulate
-from py3gpp.nrTransformPrecode import nrTransformPrecode
+from py3gpp.physical_channel_and_signal_subcomponents.nrSymbolModulate import nrSymbolModulate
+from py3gpp.physical_channel_and_signal_subcomponents.nrTransformPrecode import nrTransformPrecode
 
 sys.path.append("test_data")
 

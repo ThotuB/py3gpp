@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from py3gpp.nrPolarDecode import nrPolarDecode
+from py3gpp.transport_channel_subcomponents.nrPolarDecode import nrPolarDecode
 
 
 def test_nrPolarDecode():

@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     # --- TESTCASE1 ---
     payload = np.ones(K).astype(int)
-    cw = py3gpp.nrPolarEncode(payload, 512, nmax=nmax, iil=False)
+    cw = py3gpp.transport_channel_subcomponents.nrPolarEncode(payload, 512, nmax=nmax, iil=False)
     cw_desired = np.array(
         [
             0,
@@ -638,7 +638,7 @@ if __name__ == "__main__":
     print(payload_decoded_sionna)
     assert np.array_equal(payload, payload_decoded_sionna)
 
-    payload_decoded = py3gpp.nrPolarDecode(cw_llr, K, 512, 10, nmax=nmax, iil=False)
+    payload_decoded = py3gpp.transport_channel_subcomponents.nrPolarDecode(cw_llr, K, 512, 10, nmax=nmax, iil=False)
     assert payload_decoded.shape[0] == K
     print(payload_decoded)
     assert np.array_equal(payload, payload_decoded)
@@ -1271,7 +1271,7 @@ if __name__ == "__main__":
     print(payload_decoded_sionna)
     assert np.array_equal(payload_decoded_sionna, payload)
 
-    payload_decoded = py3gpp.nrPolarDecode(cw_llr, K, 512, 10, nmax=nmax, iil=False)
+    payload_decoded = py3gpp.transport_channel_subcomponents.nrPolarDecode(cw_llr, K, 512, 10, nmax=nmax, iil=False)
     assert payload_decoded.shape[0] == K
     print(payload_decoded)
     assert np.array_equal(payload_decoded, payload)

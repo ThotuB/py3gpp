@@ -5,8 +5,8 @@ from typing import Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrCRCDecode import nrCRCDecode
-from py3gpp.nrDLSCHInfo import getCBSInfo
+from py3gpp.downlink_transport_channels.nrDLSCHInfo import getCBSInfo
+from py3gpp.transport_channel_subcomponents.nrCRCDecode import nrCRCDecode
 
 
 def nrCodeBlockDesegmentLDPC(

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from py3gpp.nrLDPCEncode import nrLDPCEncode
+from py3gpp.transport_channel_subcomponents.nrLDPCEncode import nrLDPCEncode
 
 
 @pytest.mark.parametrize("K", [2560])

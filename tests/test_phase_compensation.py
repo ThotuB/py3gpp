@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
-from py3gpp.nrOFDMDemodulate import nrOFDMDemodulate
-from py3gpp.nrOFDMModulate import nrOFDMModulate
+from py3gpp.downlink_ofdm_modulation.nrOFDMDemodulate import nrOFDMDemodulate
+from py3gpp.downlink_ofdm_modulation.nrOFDMModulate import nrOFDMModulate
 
 
 @pytest.mark.parametrize("f0_hz", [0, 10e6, 11e6])

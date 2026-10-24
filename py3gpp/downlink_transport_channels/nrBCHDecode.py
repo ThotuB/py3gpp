@@ -3,10 +3,10 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrCRCDecode import nrCRCDecode
-from py3gpp.nrPBCHPRBS import nrPBCHPRBS
-from py3gpp.nrPolarDecode import nrPolarDecode
-from py3gpp.nrRateRecoverPolar import nrRateRecoverPolar
+from py3gpp.downlink_physical_channels.nrPBCHPRBS import nrPBCHPRBS
+from py3gpp.transport_channel_subcomponents.nrCRCDecode import nrCRCDecode
+from py3gpp.transport_channel_subcomponents.nrPolarDecode import nrPolarDecode
+from py3gpp.transport_channel_subcomponents.nrRateRecoverPolar import nrRateRecoverPolar
 
 
 def nrBCHDecode(

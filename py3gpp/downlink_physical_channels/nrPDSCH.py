@@ -3,8 +3,8 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrPRBS import nrPRBS
-from py3gpp.nrSymbolModulate import nrSymbolModulate
+from py3gpp.physical_channel_and_signal_subcomponents.nrPRBS import nrPRBS
+from py3gpp.physical_channel_and_signal_subcomponents.nrSymbolModulate import nrSymbolModulate
 
 
 def nrPDSCH(

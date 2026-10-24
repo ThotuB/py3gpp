@@ -5,7 +5,7 @@ from typing import Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrDLSCHInfo import getZlist, nrDLSCHInfo
+from py3gpp.downlink_transport_channels.nrDLSCHInfo import getZlist, nrDLSCHInfo
 
 Modulation = Literal["pi/2-BPSK", "BPSK", "QPSK", "16QAM", "64QAM", "256QAM"]
 

@@ -4,8 +4,8 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrPBCHPRBS import nrPBCHPRBS
-from py3gpp.nrSymbolModulate import nrSymbolModulate
+from py3gpp.downlink_physical_channels.nrPBCHPRBS import nrPBCHPRBS
+from py3gpp.physical_channel_and_signal_subcomponents.nrSymbolModulate import nrSymbolModulate
 
 
 def nrPBCH(ncellid: int, v: int, databits: NDArray[np.int_]) -> NDArray[np.complex128]:

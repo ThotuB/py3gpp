@@ -8,7 +8,7 @@ from importlib_resources import as_file, files  # importlib.resources only works
 from numpy.typing import NDArray
 
 from py3gpp import codes
-from py3gpp.nrDLSCHInfo import getZarray, getZlist
+from py3gpp.downlink_transport_channels.nrDLSCHInfo import getZarray, getZlist
 
 
 # This function is from Sionna

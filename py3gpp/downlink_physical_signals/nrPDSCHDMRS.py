@@ -6,8 +6,8 @@ from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.nrPRBS import nrPRBS
-from py3gpp.nrSymbolModulate import nrSymbolModulate
+from py3gpp.physical_channel_and_signal_subcomponents.nrPRBS import nrPRBS
+from py3gpp.physical_channel_and_signal_subcomponents.nrSymbolModulate import nrSymbolModulate
 
 
 def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig) -> NDArray[np.complex128]:

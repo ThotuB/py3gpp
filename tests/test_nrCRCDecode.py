@@ -1,6 +1,6 @@
 import numpy as np
 
-from py3gpp.nrCRCDecode import nrCRCDecode
+from py3gpp.transport_channel_subcomponents.nrCRCDecode import nrCRCDecode
 
 
 def test_nrCRCDecode():

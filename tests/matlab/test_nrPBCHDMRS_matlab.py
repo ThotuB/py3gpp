@@ -4,8 +4,8 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.nrPBCHDMRS import nrPBCHDMRS
-from py3gpp.nrPBCHDMRSIndices import nrPBCHDMRSIndices
+from py3gpp.downlink_physical_signals.nrPBCHDMRS import nrPBCHDMRS
+from py3gpp.downlink_physical_signals.nrPBCHDMRSIndices import nrPBCHDMRSIndices
 
 
 def run_nr_pbch_dmrs(ncellid, issb, eng):

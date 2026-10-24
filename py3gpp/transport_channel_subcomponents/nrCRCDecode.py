@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrCRCEncode import CRCPoly, nrCRCEncode
+from py3gpp.transport_channel_subcomponents.nrCRCEncode import CRCPoly, nrCRCEncode
 
 
 def _binToInt(bin: NDArray[np.int_]) -> int:

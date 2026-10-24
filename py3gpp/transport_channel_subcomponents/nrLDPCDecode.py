@@ -8,8 +8,8 @@ from importlib_resources import as_file, files  # importlib.resources only works
 from numpy.typing import NDArray
 
 from py3gpp import codes
-from py3gpp.nrDLSCHInfo import getZarray, getZlist
-from py3gpp.nrLDPCEncode import _lift_basegraph, _load_basegraph, _mul_sh
+from py3gpp.downlink_transport_channels.nrDLSCHInfo import getZarray, getZlist
+from py3gpp.transport_channel_subcomponents.nrLDPCEncode import _lift_basegraph, _load_basegraph, _mul_sh
 
 
 def nrLDPCDecode(

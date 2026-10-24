@@ -4,7 +4,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.nrPDSCH import nrPDSCH
+from py3gpp.downlink_physical_channels.nrPDSCH import nrPDSCH
 
 
 def run_nr_pdsch(cws, modulation, nlayers, nid, nrnti, eng):

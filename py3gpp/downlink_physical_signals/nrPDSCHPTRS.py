@@ -8,9 +8,9 @@ from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.nrPDSCHDMRS import PDSCHDMRSSyms
-from py3gpp.nrPRBS import nrPRBS
-from py3gpp.nrSymbolModulate import nrSymbolModulate
+from py3gpp.downlink_physical_signals.nrPDSCHDMRS import PDSCHDMRSSyms
+from py3gpp.physical_channel_and_signal_subcomponents.nrPRBS import nrPRBS
+from py3gpp.physical_channel_and_signal_subcomponents.nrSymbolModulate import nrSymbolModulate
 
 
 def nrPDSCHPTRS(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> list | NDArray[np.complex128]:

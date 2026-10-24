@@ -7,7 +7,7 @@ import pytest
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.nrPDSCHDMRS import nrPDSCHDMRS
+from py3gpp.downlink_physical_signals.nrPDSCHDMRS import nrPDSCHDMRS
 
 
 def run_nr_pdschdmrs(cfg, eng):

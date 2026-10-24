@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrPBCHDMRSIndices import nrPBCHDMRSIndices
+from py3gpp.downlink_physical_signals.nrPBCHDMRSIndices import nrPBCHDMRSIndices
 
 
 def nrPBCHIndices(ibar: int) -> NDArray[np.int_]:

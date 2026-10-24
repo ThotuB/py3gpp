@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.nrPDSCHDMRS import PDSCHDMRSSyms
+from py3gpp.downlink_physical_signals.nrPDSCHDMRS import PDSCHDMRSSyms
 
 
 def nrPDSCHIndices(carrier: nrCarrierConfig, pdsch: nrPDSCHConfig) -> NDArray[np.int_]:

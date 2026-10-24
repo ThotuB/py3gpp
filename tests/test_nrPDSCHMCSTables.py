@@ -1,6 +1,6 @@
 import numpy as np
 
-from py3gpp.nrPDSCHMCSTables import nrPDSCHMCSTables
+from py3gpp.transport_channel_subcomponents.nrPDSCHMCSTables import nrPDSCHMCSTables
 
 
 def test_nrPDSCHMCSTables():

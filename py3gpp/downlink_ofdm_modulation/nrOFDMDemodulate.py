@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
-from py3gpp.nrOFDMInfo import nrOFDMInfo
+from py3gpp.downlink_ofdm_modulation.nrOFDMInfo import nrOFDMInfo
 
 
 # TODO: implement CyclicPrefixFraction

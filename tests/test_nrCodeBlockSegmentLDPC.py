@@ -1,8 +1,8 @@
 import numpy as np
 import test_data.ldpc
 
-from py3gpp.nrCodeBlockDesegmentLDPC import nrCodeBlockDesegmentLDPC
-from py3gpp.nrCodeBlockSegmentLDPC import nrCodeBlockSegmentLDPC
+from py3gpp.transport_channel_subcomponents.nrCodeBlockDesegmentLDPC import nrCodeBlockDesegmentLDPC
+from py3gpp.transport_channel_subcomponents.nrCodeBlockSegmentLDPC import nrCodeBlockSegmentLDPC
 
 
 def array_to_int(data):

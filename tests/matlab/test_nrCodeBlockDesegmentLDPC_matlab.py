@@ -6,7 +6,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.nrCodeBlockDesegmentLDPC import nrCodeBlockDesegmentLDPC
+from py3gpp.transport_channel_subcomponents.nrCodeBlockDesegmentLDPC import nrCodeBlockDesegmentLDPC
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 import test_data.ldpc

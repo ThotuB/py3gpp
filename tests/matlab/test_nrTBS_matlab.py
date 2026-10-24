@@ -2,7 +2,7 @@ import matlab.engine
 import numpy as np
 import pytest
 
-from py3gpp.nrTBS import nrTBS
+from py3gpp.transport_channel_subcomponents.nrTBS import nrTBS
 
 
 @pytest.fixture(scope="session")

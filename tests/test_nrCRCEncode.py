@@ -1,6 +1,6 @@
 import numpy as np
 
-from py3gpp.nrCRCEncode import nrCRCEncode
+from py3gpp.transport_channel_subcomponents.nrCRCEncode import nrCRCEncode
 
 
 def test_nrCRCEncode():

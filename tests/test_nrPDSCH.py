@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import pytest
 
-from py3gpp.nrPDSCH import nrPDSCH
+from py3gpp.downlink_physical_channels.nrPDSCH import nrPDSCH
 
 sys.path.append("test_data")
 

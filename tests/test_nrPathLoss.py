@@ -1,7 +1,7 @@
 import numpy as np
 
 from py3gpp.configs.nrPathLossConfig import nrPathLossConfig
-from py3gpp.nrPathLoss import nrPathLoss
+from py3gpp.signal_reception_and_recovery.nrPathLoss import nrPathLoss
 
 
 def test_nrPathLoss():

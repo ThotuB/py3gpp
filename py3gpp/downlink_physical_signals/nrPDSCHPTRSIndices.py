@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 
 from py3gpp.configs.nrCarrierConfig import nrCarrierConfig
 from py3gpp.configs.nrPDSCHConfig import nrPDSCHConfig
-from py3gpp.nrPDSCHPTRS import PDSCHPTRSSyms
+from py3gpp.downlink_physical_signals.nrPDSCHPTRS import PDSCHPTRSSyms
 
 
 def nrPDSCHPTRSIndices(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> NDArray[Any]:

@@ -5,8 +5,8 @@ from typing import Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from py3gpp.nrCRCEncode import nrCRCEncode
-from py3gpp.nrDLSCHInfo import getCBSInfo
+from py3gpp.downlink_transport_channels.nrDLSCHInfo import getCBSInfo
+from py3gpp.transport_channel_subcomponents.nrCRCEncode import nrCRCEncode
 
 
 def nrCodeBlockSegmentLDPC(blk: NDArray[np.int_], bgn: Literal[1, 2]) -> NDArray[np.int_]:
