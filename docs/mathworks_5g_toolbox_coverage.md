@@ -4,7 +4,7 @@ Function/class inventory crawled from the MathWorks 5G Toolbox documentation (`m
 
 Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks uses on each page (e.g. "CRC Operations", "Physical Broadcast Channel"). Where a page presents its functions as one flat list with no such labels, it's kept as a single table.
 
-**Summary: 58 of 136 unique functions/classes implemented (~43%).** Uplink is a complete gap (0 of 48). PUCCH/PRACH families are entirely unimplemented; PDCCH/DCI has channel coding/modulation but not resource mapping (see Notable gaps). Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
+**Summary: 62 of 136 unique functions/classes implemented (~46%).** Uplink is a complete gap (0 of 48). PUCCH/PRACH families are entirely unimplemented; PDCCH/DCI has channel coding, modulation, and non-interleaved resource mapping, but not search-space candidate hashing (see Notable gaps). Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
 
 ---
 
@@ -103,11 +103,11 @@ Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks us
 | Function | Description | Status |
 |---|---|---|
 | `nrPDCCH` | Generate PDCCH modulation symbols | ✅ `dl/ch/phy/pdcch.py` |
-| `nrPDCCHResources` | Generate PDCCH and PDCCH DM-RS resources | ❌ (resource mapping deferred, see Notable gaps) |
-| `nrPDCCHSpace` | Generate PDCCH resources for all candidates and aggregation levels | ❌ (resource mapping deferred, see Notable gaps) |
-| `nrPDCCHConfig` | PDCCH configuration parameters | ❌ (resource mapping deferred, see Notable gaps) |
-| `nrCORESETConfig` | Control resource set (CORESET) configuration parameters | ❌ (resource mapping deferred, see Notable gaps) |
-| `nrSearchSpaceConfig` | Search space set configuration parameters | ❌ (resource mapping deferred, see Notable gaps) |
+| `nrPDCCHResources` | Generate PDCCH and PDCCH DM-RS resources | ✅ `dl/ch/phy/pdcch.py` (non-interleaved CCE-to-REG mapping only, see Notable gaps) |
+| `nrPDCCHSpace` | Generate PDCCH resources for all candidates and aggregation levels | ❌ (search-space candidate hashing deferred, see Notable gaps) |
+| `nrPDCCHConfig` | PDCCH configuration parameters | ✅ `dl/ch/phy/pdcch.py` |
+| `nrCORESETConfig` | Control resource set (CORESET) configuration parameters | ✅ `dl/ch/phy/pdcch.py` |
+| `nrSearchSpaceConfig` | Search space set configuration parameters | ✅ `dl/ch/phy/pdcch.py` |
 | `nrPDCCHDecode` | Decode PDCCH modulation symbols | ✅ `dl/ch/phy/pdcch.py` |
 | `nrPDCCHPRBS` | Generate PDCCH scrambling sequence | ✅ `dl/ch/phy/pdcch.py` |
 
@@ -379,7 +379,7 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch)._
 ## Notable gaps worth prioritizing
 
 - **Uplink: nothing exists.** No PUSCH, PUCCH, PRACH, SRS, UL-SCH, or UCI support.
-- **PDCCH/DCI: channel coding + modulation layer only** (`nrDCIEncode`/`nrDCIDecode`, `nrPDCCH`/`nrPDCCHDecode`/`nrPDCCHPRBS`). Resource mapping — `nrPDCCHConfig`/`nrCORESETConfig`/`nrSearchSpaceConfig`, CCE-to-REG interleaving (`nrPDCCHResources`), and search-space candidate hashing per TS 38.213 §10.1 (`nrPDCCHSpace`) — is a deferred follow-up; no existing pattern in this codebase to mirror and no bundled MATLAB reference data to validate against.
+- **PDCCH/DCI: channel coding, modulation, and non-interleaved resource mapping only** (`nrDCIEncode`/`nrDCIDecode`, `nrPDCCH`/`nrPDCCHDecode`/`nrPDCCHPRBS`, `nrPDCCHConfig`/`nrCORESETConfig`/`nrSearchSpaceConfig`, `nrPDCCHResources`). Still deferred: interleaved CCE-to-REG mapping (`nrPDCCHResources` raises `NotImplementedError` for `CCEREGMapping="interleaved"`) and search-space candidate hashing per TS 38.213 §10.1 (`nrPDCCHSpace`) — low confidence in exact formula recall for both, and no bundled MATLAB reference data to validate against.
 - **No channel models** (CDL/TDL/HST) — only path loss is covered.
 - **No perfect channel/timing estimation** — only the "practical" (blind) estimators exist, useful for BER/ideal-case benchmarking.
 - `nrPBCHDecode` (physical-channel-level PBCH LLR demod) has no standalone equivalent — only transport-level `nrBCHDecode` exists.
