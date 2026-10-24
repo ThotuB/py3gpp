@@ -2,6 +2,7 @@
 # Ref: TS 38.211 Sections 7.3.1.3
 from __future__ import annotations
 
+import math
 from typing import Literal
 
 import numpy as np
@@ -31,6 +32,16 @@ def nrPRBS(c_init: int, length: int) -> NDArray[np.int32]:
     gold_seq = (mseq_0 + mseq_1) % 2
     gold_seq = np.roll(gold_seq, -Nc)
     return gold_seq[:length]
+
+
+# TS 38.211 Section 5.2.2
+def nrLowPAPRS(u: int, length: int) -> NDArray[np.complex128]:
+    """Generate low-PAPR (Zadoff-Chu) sequence."""
+    assert length > 0 and length % 2 == 1, "length must be a positive odd integer"
+    assert math.gcd(u, length) == 1, "u and length must be coprime"
+
+    m = np.arange(length)
+    return np.exp(-1j * np.pi * u * m * (m + 1) / length)
 
 
 # 38.211 5.1 Modulation mapper

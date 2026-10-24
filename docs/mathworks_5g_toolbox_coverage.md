@@ -4,7 +4,7 @@ Function/class inventory crawled from the MathWorks 5G Toolbox documentation (`m
 
 Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks uses on each page (e.g. "CRC Operations", "Physical Broadcast Channel"). Where a page presents its functions as one flat list with no such labels, it's kept as a single table.
 
-**Summary: 74 of 136 unique functions/classes implemented (~54%).** Uplink now has PUSCH (single-layer, `MappingType="A"` only) plus `nrULSCHInfo`; PUCCH, PRACH, SRS, and UCI remain entirely unimplemented. PDCCH/DCI has channel coding, modulation, and non-interleaved resource mapping, but not search-space candidate hashing; CSI-RS covers only Rows 1-3 of its 18-row resource-mapping table (see Notable gaps). Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
+**Summary: 79 of 136 unique functions/classes implemented (~58%).** Uplink now has PUSCH (single-layer, `MappingType="A"` only), `nrULSCHInfo`, and PRACH (long preambles, Formats 0-2, unrestricted set, FR1 only); PUCCH, SRS, and UCI remain entirely unimplemented. PDCCH/DCI has channel coding, modulation, and non-interleaved resource mapping, but not search-space candidate hashing; CSI-RS covers only Rows 1-3 of its 18-row resource-mapping table (see Notable gaps). Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
 
 ---
 
@@ -234,12 +234,12 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPRACH` | Generate PRACH symbols | ❌ |
-| `nrPRACHIndices` | Generate PRACH resource element indices | ❌ |
-| `nrPRACHConfig` | PRACH configuration parameters | ❌ |
+| `nrPRACH` | Generate PRACH symbols | ✅ `ul/ch/phy/prach.py` (long preambles, Formats 0/1/2, unrestricted set, FR1 only, see Notable gaps) |
+| `nrPRACHIndices` | Generate PRACH resource element indices | ✅ `ul/ch/phy/prach.py` (same scope as `nrPRACH`) |
+| `nrPRACHConfig` | PRACH configuration parameters | ✅ `ul/ch/phy/prach.py` |
 | `nrPRACHGrid` | Generate PRACH resource grid | ❌ |
-| `nrPRACHOFDMModulate` | Generate PRACH OFDM modulated waveform | ❌ |
-| `nrPRACHOFDMInfo` | Get PRACH OFDM information | ❌ |
+| `nrPRACHOFDMModulate` | Generate PRACH OFDM modulated waveform | ❌ (see Notable gaps) |
+| `nrPRACHOFDMInfo` | Get PRACH OFDM information | ✅ `ul/ch/phy/prach.py` (Format 0, `StartingSymbol=0` only, see Notable gaps) |
 | `nrPRACHDetect` | Detect PRACH transmission | ❌ |
 
 #### Carrier Configuration
@@ -280,8 +280,8 @@ _No sub-grouping on this page — flat function list._
 | `nrOFDMModulate` | Generate OFDM modulated waveform | ✅ `dl/ofdm.py` (shared, not UL-specific) |
 | `nrOFDMDemodulate` | Demodulate OFDM waveform | ✅ `dl/ofdm.py` (shared) |
 | `nrOFDMInfo` | Get OFDM information | ✅ `dl/ofdm.py` (shared) |
-| `nrPRACHOFDMModulate` | Generate PRACH OFDM modulated waveform | ❌ |
-| `nrPRACHOFDMInfo` | Get PRACH OFDM information | ❌ |
+| `nrPRACHOFDMModulate` | Generate PRACH OFDM modulated waveform | ❌ (see Notable gaps) |
+| `nrPRACHOFDMInfo` | Get PRACH OFDM information | ✅ `ul/ch/phy/prach.py` (Format 0, `StartingSymbol=0` only, see Notable gaps) |
 | `nrResourceGrid` | Generate empty carrier slot resource grid | ✅ `dl/ofdm.py` (shared) |
 | `nrTransformPrecode` | Generate transform precoded symbols | ✅ `plc/sym.py` |
 | `nrTransformDeprecode` | Recover transform deprecoded symbols | ✅ `plc/sym.py` |
@@ -335,7 +335,7 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch; unl
 | Function | Description | Status |
 |---|---|---|
 | `nrPRBS` | Generate PRBS | ✅ `plc/sym.py` |
-| `nrLowPAPRS` | Generate low peak-to-average power ratio (low-PAPR) sequence | ❌ |
+| `nrLowPAPRS` | Generate low peak-to-average power ratio (low-PAPR) sequence | ✅ `plc/sym.py` |
 | `nrSymbolModulate` | Generate modulated symbols | ✅ `plc/sym.py` |
 | `nrSymbolDemodulate` | Demodulate and convert symbols to bits | ✅ `plc/sym.py` |
 | `nrLayerMap` | Layer mapping of modulated and scrambled codewords | ✅ `plc/sym.py` |
@@ -378,7 +378,7 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch)._
 
 ## Notable gaps worth prioritizing
 
-- **Uplink: PUSCH + `nrULSCHInfo` only.** PUSCH (`ul/ch/phy/pusch.py`) is single-layer, `MappingType="A"`, `DMRSConfigurationType=1` only (same real limitations `nrPDSCH`/`nrPDSCHDMRS` have). `nrPUSCHCodebook` (MIMO precoding) is unimplemented since multi-layer PUSCH isn't supported yet. PUCCH (all 5 formats), PRACH, SRS, UCI, and UL-SCH multiplexing/demultiplexing are entirely unimplemented.
+- **Uplink: PUSCH, PRACH (long preambles only), and `nrULSCHInfo`.** PUSCH (`ul/ch/phy/pusch.py`) is single-layer, `MappingType="A"`, `DMRSConfigurationType=1` only (same real limitations `nrPDSCH`/`nrPDSCHDMRS` have). `nrPUSCHCodebook` (MIMO precoding) is unimplemented since multi-layer PUSCH isn't supported yet. PRACH (`ul/ch/phy/prach.py`) covers long preambles (Formats 0-2, `L_RA=839`) with the unrestricted cyclic-shift set, FR1 only — verified against a live MATLAB 5G Toolbox session (exact sequence/indices/OFDM-info match for Formats 0-2, plus the full embedded root-sequence and FR1 config tables transcribed directly from the toolbox source, since 3GPP numeric tables aren't copyrightable MathWorks expression). Deferred: Format 3 (5 kHz, fractional slot-duration semantics not yet verified), short preambles (`L_RA=139/571/1151`), restricted sets Type A/B, FR2, `nrPRACHOFDMInfo` beyond Format 0/`StartingSymbol=0` (the general case needs the `getSubframeAdjustment` subframe-straddling logic, which is substantial), and `nrPRACHOFDMModulate`/`nrPRACHGrid`/`nrPRACHDetect` entirely. PUCCH (all 5 formats), SRS, UCI, and UL-SCH multiplexing/demultiplexing are entirely unimplemented.
 - **PDCCH/DCI: channel coding, modulation, and non-interleaved resource mapping only** (`nrDCIEncode`/`nrDCIDecode`, `nrPDCCH`/`nrPDCCHDecode`/`nrPDCCHPRBS`, `nrPDCCHConfig`/`nrCORESETConfig`/`nrSearchSpaceConfig`, `nrPDCCHResources`). Still deferred: interleaved CCE-to-REG mapping (`nrPDCCHResources` raises `NotImplementedError` for `CCEREGMapping="interleaved"`) and search-space candidate hashing per TS 38.213 §10.1 (`nrPDCCHSpace`) — low confidence in exact formula recall for both, and no bundled MATLAB reference data to validate against.
 - **CSI-RS: Rows 1-3 of 18 only** (`nrCSIRS`/`nrCSIRSIndices`/`nrCSIRSConfig` in `dl/sig/csirs.py`) — 1-port (density `'three'`/`'one'`) and 2-port fd-CDM2. Rows 4-18 (4/8/12/16/24/32-port, CDM4/CDM8, multi-frequency-group patterns) raise `NotImplementedError`: the exact k-offset combinations in TS 38.211 Table 7.4.1.5.3-1 couldn't be verified without a live MATLAB session or the spec text itself (MathWorks docs only cite the table, they don't reproduce it). ZP (zero-power/muted) CSI-RS is also unimplemented. `nrCSIReportConfig` is unimplemented — it's a pure CQI/PMI/RI feedback-reporting parameter container with no consuming function anywhere in this repo (no uplink, no CSI measurement/reporting processing exists at all).
 - **No channel models** (CDL/TDL/HST) — only path loss is covered.

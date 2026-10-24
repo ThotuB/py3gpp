@@ -26,7 +26,15 @@ from .dl.sig.pbch_dmrs import nrPBCHDMRS, nrPBCHDMRSIndices
 from .dl.sig.pdsch_dmrs import nrPDSCHDMRS, nrPDSCHDMRSIndices
 from .dl.sig.pdsch_ptrs import nrPDSCHPTRS, nrPDSCHPTRSIndices
 from .dl.sig.ss import nrPSS, nrPSSIndices, nrSSS, nrSSSIndices
-from .plc.sym import nrLayerMap, nrPRBS, nrSymbolDemodulate, nrSymbolModulate, nrTransformDeprecode, nrTransformPrecode
+from .plc.sym import (
+    nrLayerMap,
+    nrLowPAPRS,
+    nrPRBS,
+    nrSymbolDemodulate,
+    nrSymbolModulate,
+    nrTransformDeprecode,
+    nrTransformPrecode,
+)
 from .plc.trs.crc import nrCRCDecode, nrCRCEncode
 from .plc.trs.ldpc import (
     nrCodeBlockDesegmentLDPC,
@@ -39,6 +47,7 @@ from .plc.trs.ldpc import (
 from .plc.trs.polar import nrPolarDecode, nrPolarEncode, nrRateMatchPolar, nrRateRecoverPolar
 from .plc.trs.ref import nrPDSCHMCSTables, nrTBS
 from .rx import nrChannelEstimate, nrEqualizeMMSE, nrExtractResources, nrPathLoss, nrPathLossConfig, nrTimingEstimate
+from .ul.ch.phy.prach import nrPRACH, nrPRACHConfig, nrPRACHIndices, nrPRACHOFDMInfo
 from .ul.ch.phy.pusch import nrPUSCH, nrPUSCHConfig, nrPUSCHDecode, nrPUSCHDMRSConfig, nrPUSCHIndices, nrPUSCHPRBS
 from .ul.ch.trs.ulsch import nrULSCHInfo
 from .ul.sig.pusch_dmrs import nrPUSCHDMRS, nrPUSCHDMRSIndices
