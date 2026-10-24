@@ -1,8 +1,7 @@
 import numpy as np
 import test_data.ldpc
 
-from py3gpp.plc.trs.ldpc import (nrCodeBlockDesegmentLDPC,
-                                 nrCodeBlockSegmentLDPC)
+from py3gpp.plc.trs.ldpc import nrCodeBlockDesegmentLDPC, nrCodeBlockSegmentLDPC
 
 
 def array_to_int(data):

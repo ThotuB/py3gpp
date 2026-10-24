@@ -4,7 +4,7 @@ Function/class inventory crawled from the MathWorks 5G Toolbox documentation (`m
 
 Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks uses on each page (e.g. "CRC Operations", "Physical Broadcast Channel"). Where a page presents its functions as one flat list with no such labels, it's kept as a single table.
 
-**Summary: 65 of 136 unique functions/classes implemented (~48%).** Uplink is a complete gap (0 of 48). PUCCH/PRACH families are entirely unimplemented; PDCCH/DCI has channel coding, modulation, and non-interleaved resource mapping, but not search-space candidate hashing; CSI-RS covers only Rows 1-3 of its 18-row resource-mapping table (see Notable gaps). Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
+**Summary: 74 of 136 unique functions/classes implemented (~54%).** Uplink now has PUSCH (single-layer, `MappingType="A"` only) plus `nrULSCHInfo`; PUCCH, PRACH, SRS, and UCI remain entirely unimplemented. PDCCH/DCI has channel coding, modulation, and non-interleaved resource mapping, but not search-space candidate hashing; CSI-RS covers only Rows 1-3 of its 18-row resource-mapping table (see Notable gaps). Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
 
 ---
 
@@ -159,7 +159,7 @@ _No sub-grouping on this page — flat function list._
 
 ## Uplink Channels
 
-**Entirely unimplemented — py3gpp has no uplink support at all.**
+**PUSCH is implemented (single-layer, `MappingType="A"`, `DMRSConfigurationType=1` only — the same real limitations `nrPDSCH`/`nrPDSCHDMRS` have today). PUCCH, PRACH, SRS, and UCI remain entirely unimplemented.**
 
 ### Uplink Physical Signals
 
@@ -167,9 +167,9 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPUSCHDMRS` | Generate PUSCH DM-RS symbols | ❌ |
-| `nrPUSCHDMRSIndices` | Generate PUSCH DM-RS indices | ❌ |
-| `nrPUSCHDMRSConfig` | PUSCH DM-RS configuration parameters | ❌ |
+| `nrPUSCHDMRS` | Generate PUSCH DM-RS symbols | ✅ `ul/sig/pusch_dmrs.py` |
+| `nrPUSCHDMRSIndices` | Generate PUSCH DM-RS indices | ✅ `ul/sig/pusch_dmrs.py` |
+| `nrPUSCHDMRSConfig` | PUSCH DM-RS configuration parameters | ✅ `ul/ch/phy/pusch.py` |
 
 #### PUSCH Phase Tracking Reference Signal
 
@@ -193,17 +193,17 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrPUSCH` | Generate PUSCH modulation symbols | ❌ |
-| `nrPUSCHIndices` | Generate PUSCH resource element indices | ❌ |
-| `nrPUSCHConfig` | PUSCH configuration parameters | ❌ |
-| `nrPUSCHDecode` | Decode PUSCH modulation symbols | ❌ |
-| `nrPUSCHCodebook` | Generate PUSCH precoding matrix | ❌ |
-| `nrPUSCHScramble` | Perform PUSCH scrambling | ❌ |
-| `nrPUSCHDescramble` | Perform PUSCH descrambling | ❌ |
-| `nrPUSCHPRBS` | Generate PUSCH scrambling sequence | ❌ |
-| `nrPUSCHDMRS` | Generate PUSCH DM-RS symbols | ❌ |
-| `nrPUSCHDMRSIndices` | Generate PUSCH DM-RS indices | ❌ |
-| `nrPUSCHDMRSConfig` | PUSCH DM-RS configuration parameters | ❌ |
+| `nrPUSCH` | Generate PUSCH modulation symbols | ✅ `ul/ch/phy/pusch.py` (single-layer only; optional transform precoding via `nrTransformPrecode`) |
+| `nrPUSCHIndices` | Generate PUSCH resource element indices | ✅ `ul/ch/phy/pusch.py` |
+| `nrPUSCHConfig` | PUSCH configuration parameters | ✅ `ul/ch/phy/pusch.py` |
+| `nrPUSCHDecode` | Decode PUSCH modulation symbols | ✅ `ul/ch/phy/pusch.py` |
+| `nrPUSCHCodebook` | Generate PUSCH precoding matrix | ❌ (MIMO precoding — `nrPUSCH` only supports `nlayers=1` so far) |
+| `nrPUSCHScramble` | Perform PUSCH scrambling | ❌ (scrambling inlined into `nrPUSCH`/`nrPUSCHDecode`, matching how PDSCH does it) |
+| `nrPUSCHDescramble` | Perform PUSCH descrambling | ❌ (same — inlined) |
+| `nrPUSCHPRBS` | Generate PUSCH scrambling sequence | ✅ `ul/ch/phy/pusch.py` |
+| `nrPUSCHDMRS` | Generate PUSCH DM-RS symbols | ✅ `ul/sig/pusch_dmrs.py` |
+| `nrPUSCHDMRSIndices` | Generate PUSCH DM-RS indices | ✅ `ul/sig/pusch_dmrs.py` |
+| `nrPUSCHDMRSConfig` | PUSCH DM-RS configuration parameters | ✅ `ul/ch/phy/pusch.py` |
 | `nrPUSCHPTRS` | Generate PUSCH PT-RS symbols | ❌ |
 | `nrPUSCHPTRSIndices` | Generate PUSCH PT-RS Indices | ❌ |
 | `nrPUSCHPTRSConfig` | PUSCH PT-RS configuration parameters | ❌ |
@@ -258,7 +258,7 @@ _No sub-grouping on this page — flat function list._
 |---|---|---|
 | `nrULSCH` | Apply UL-SCH encoder processing chain | ❌ |
 | `nrULSCHDecoder` | Apply UL-SCH decoder processing chain | ❌ |
-| `nrULSCHInfo` | Get uplink shared channel (UL-SCH) information | ❌ |
+| `nrULSCHInfo` | Get uplink shared channel (UL-SCH) information | ✅ `ul/ch/trs/ulsch.py` (thin wrapper reusing `nrDLSCHInfo`'s base-graph/CB-segmentation helpers — shared math per TS 38.212) |
 | `nrULSCHMultiplex` | Perform UL-SCH data and control multiplexing | ❌ |
 | `nrULSCHDemultiplex` | Perform UL-SCH data and control demultiplexing | ❌ |
 
@@ -378,7 +378,7 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch)._
 
 ## Notable gaps worth prioritizing
 
-- **Uplink: nothing exists.** No PUSCH, PUCCH, PRACH, SRS, UL-SCH, or UCI support.
+- **Uplink: PUSCH + `nrULSCHInfo` only.** PUSCH (`ul/ch/phy/pusch.py`) is single-layer, `MappingType="A"`, `DMRSConfigurationType=1` only (same real limitations `nrPDSCH`/`nrPDSCHDMRS` have). `nrPUSCHCodebook` (MIMO precoding) is unimplemented since multi-layer PUSCH isn't supported yet. PUCCH (all 5 formats), PRACH, SRS, UCI, and UL-SCH multiplexing/demultiplexing are entirely unimplemented.
 - **PDCCH/DCI: channel coding, modulation, and non-interleaved resource mapping only** (`nrDCIEncode`/`nrDCIDecode`, `nrPDCCH`/`nrPDCCHDecode`/`nrPDCCHPRBS`, `nrPDCCHConfig`/`nrCORESETConfig`/`nrSearchSpaceConfig`, `nrPDCCHResources`). Still deferred: interleaved CCE-to-REG mapping (`nrPDCCHResources` raises `NotImplementedError` for `CCEREGMapping="interleaved"`) and search-space candidate hashing per TS 38.213 §10.1 (`nrPDCCHSpace`) — low confidence in exact formula recall for both, and no bundled MATLAB reference data to validate against.
 - **CSI-RS: Rows 1-3 of 18 only** (`nrCSIRS`/`nrCSIRSIndices`/`nrCSIRSConfig` in `dl/sig/csirs.py`) — 1-port (density `'three'`/`'one'`) and 2-port fd-CDM2. Rows 4-18 (4/8/12/16/24/32-port, CDM4/CDM8, multi-frequency-group patterns) raise `NotImplementedError`: the exact k-offset combinations in TS 38.211 Table 7.4.1.5.3-1 couldn't be verified without a live MATLAB session or the spec text itself (MathWorks docs only cite the table, they don't reproduce it). ZP (zero-power/muted) CSI-RS is also unimplemented. `nrCSIReportConfig` is unimplemented — it's a pure CQI/PMI/RI feedback-reporting parameter container with no consuming function anywhere in this repo (no uplink, no CSI measurement/reporting processing exists at all).
 - **No channel models** (CDL/TDL/HST) — only path loss is covered.

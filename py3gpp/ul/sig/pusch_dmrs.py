@@ -1,0 +1,126 @@
+# 38.211
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+import numpy as np
+from numpy.typing import NDArray
+
+from py3gpp.dl.ofdm import nrCarrierConfig
+from py3gpp.plc.sym import nrPRBS, nrSymbolModulate
+
+if TYPE_CHECKING:
+    # imported only for type hints: avoids a circular import, since nrPUSCHConfig's
+    # home module (ul.ch.phy.pusch) itself imports PUSCHDMRSSyms from this file
+    from py3gpp.ul.ch.phy.pusch import nrPUSCHConfig
+
+
+def nrPUSCHDMRS(cfg: nrPUSCHConfig, carrier: nrCarrierConfig) -> NDArray[np.complex128]:
+    """Generate PUSCH DM-RS symbols."""
+    if cfg.DMRS.DMRSConfigurationType == 1:
+        n_dmrs_per_re = 6
+    else:
+        n_dmrs_per_re = 4
+    n_dmrs_bits_re = 2 * n_dmrs_per_re
+
+    NSizeBWP = carrier.NSizeGrid if cfg.NSizeBWP is None else cfg.NSizeBWP
+    # TS 38.211 6.4.1.1.1: NIDNSCID defaults to the physical cell ID when not configured
+    NIDNSCID = carrier.NCellID if cfg.DMRS.NIDNSCID is None else cfg.DMRS.NIDNSCID
+
+    dmrs_begin = n_dmrs_bits_re * min(cfg.PRBSet)
+    dmrs_end = n_dmrs_bits_re * (max(cfg.PRBSet) + 1)
+    dmrs_size = n_dmrs_bits_re * NSizeBWP
+
+    n_scid = cfg.DMRS.NSCID
+
+    occupied_syms = PUSCHDMRSSyms(cfg)
+
+    dmrs_syms = np.array([])
+    for n_symb in occupied_syms:
+        cinit_dmrs = PUSCHDMRScinit(carrier.SymbolsPerSlot, carrier.NSlot, n_symb, NIDNSCID, n_scid)
+        dmrs_prbs = nrPRBS(cinit_dmrs, dmrs_size)
+
+        dmrs_prbs = dmrs_prbs[dmrs_begin:dmrs_end]
+        dmrs_syms = np.append(dmrs_syms, nrSymbolModulate(dmrs_prbs, "QPSK"))
+
+    return dmrs_syms
+
+
+# LUT for DMRS occupied symbols positions
+def PUSCHDMRSSyms(cfg: nrPUSCHConfig) -> NDArray[np.int_]:
+    assert cfg.MappingType in ["A"], "Mapping type B is not yet implemented"
+    l1 = 11
+    typeA_pos = cfg.DMRS.DMRSTypeAPosition
+    sym_alloc = cfg.SymbolAllocation[1]
+    add_pos = cfg.DMRS.DMRSAdditionalPosition
+    dmrs_len = cfg.DMRS.DMRSLength
+
+    occupied_syms = np.array([typeA_pos], dtype=int)
+
+    if dmrs_len == 1:  # Table 6.4.1.1.3-3, Type A
+        if sym_alloc in [8, 9]:
+            if add_pos > 0:
+                occupied_syms = np.append(occupied_syms, 7)
+        elif sym_alloc in [10, 11]:
+            if add_pos == 1:
+                occupied_syms = np.append(occupied_syms, 9)
+            elif add_pos == 2 or add_pos == 3:
+                occupied_syms = np.append(occupied_syms, [6, 9])
+        elif sym_alloc == 12:
+            if add_pos == 1:
+                occupied_syms = np.append(occupied_syms, 9)
+            elif add_pos == 2:
+                occupied_syms = np.append(occupied_syms, [6, 9])
+            elif add_pos == 3:
+                occupied_syms = np.append(occupied_syms, [5, 8, 11])
+        elif sym_alloc in [13, 14]:
+            if add_pos == 1:
+                occupied_syms = np.append(occupied_syms, l1)
+            elif add_pos == 2:
+                occupied_syms = np.append(occupied_syms, [7, 11])
+            elif add_pos == 3:
+                occupied_syms = np.append(occupied_syms, [5, 8, 11])
+    else:  # Table 6.4.1.1.3-4, Type A
+        if add_pos == 1:
+            if sym_alloc in [10, 11, 12]:
+                occupied_syms = np.append(occupied_syms, 8)
+            elif sym_alloc in [13, 14]:
+                occupied_syms = np.append(occupied_syms, 10)
+        elif add_pos > 1:
+            raise ValueError("add_pos has to be [0, 1] for double-symbol")
+
+        occupied_syms = np.concatenate((occupied_syms[np.newaxis], occupied_syms[np.newaxis] + 1), axis=0).T.ravel()
+
+    return occupied_syms
+
+
+def PUSCHDMRScinit(sps: int, n_slot: int, n_symb: int, NIDSCID: int, n_scid: int) -> int:
+    return 2**17 * (sps * n_slot + n_symb + 1) * (2 * NIDSCID + 1) + 2 * NIDSCID + n_scid
+
+
+def nrPUSCHDMRSIndices(carrier: nrCarrierConfig, cfg: nrPUSCHConfig) -> NDArray[np.int_]:
+    """Generate PUSCH DM-RS indices."""
+    NRBSize = carrier.NStartGrid if not cfg.NRBSize else cfg.NRBSize
+    NSizeBWP = carrier.NSizeGrid if cfg.NSizeBWP is None else cfg.NSizeBWP
+
+    frame_begin = NRBSize * min(cfg.PRBSet)
+    frame_end = NRBSize * (max(cfg.PRBSet) + 1)
+    frame_size = NRBSize * NSizeBWP
+
+    dmrs_full_range = np.array(list(range(frame_begin, frame_end)))
+
+    if cfg.DMRS.DMRSConfigurationType == 1:
+        occupied_res = dmrs_full_range[::2]
+    elif cfg.DMRS.DMRSConfigurationType == 2:
+        occupied_res = dmrs_full_range.reshape(-1, 2)[::3].ravel()
+    else:
+        raise AssertionError(f"unreachable: unsupported DMRSConfigurationType {cfg.DMRS.DMRSConfigurationType}")
+
+    occupied_syms = PUSCHDMRSSyms(cfg)
+
+    dmrs_indices = np.array([], int)
+    for idx, sym in enumerate(occupied_syms):
+        sym_offset = sym * frame_size
+        dmrs_indices = np.append(dmrs_indices, (occupied_res + sym_offset))
+
+    return dmrs_indices

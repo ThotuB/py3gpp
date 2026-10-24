@@ -3,8 +3,7 @@ import sys
 import numpy as np
 import pytest
 
-from py3gpp.plc.sym import (nrSymbolModulate, nrTransformDeprecode,
-                            nrTransformPrecode)
+from py3gpp.plc.sym import nrSymbolModulate, nrTransformDeprecode, nrTransformPrecode
 
 sys.path.append("test_data")
 

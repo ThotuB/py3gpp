@@ -39,3 +39,6 @@ from .plc.trs.ldpc import (
 from .plc.trs.polar import nrPolarDecode, nrPolarEncode, nrRateMatchPolar, nrRateRecoverPolar
 from .plc.trs.ref import nrPDSCHMCSTables, nrTBS
 from .rx import nrChannelEstimate, nrEqualizeMMSE, nrExtractResources, nrPathLoss, nrPathLossConfig, nrTimingEstimate
+from .ul.ch.phy.pusch import nrPUSCH, nrPUSCHConfig, nrPUSCHDecode, nrPUSCHDMRSConfig, nrPUSCHIndices, nrPUSCHPRBS
+from .ul.ch.trs.ulsch import nrULSCHInfo
+from .ul.sig.pusch_dmrs import nrPUSCHDMRS, nrPUSCHDMRSIndices
