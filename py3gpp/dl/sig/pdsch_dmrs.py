@@ -31,7 +31,7 @@ def nrPDSCHDMRS(cfg: nrPDSCHConfig, carrier: nrCarrierConfig) -> NDArray[np.comp
     dmrs_end = n_dmrs_bits_re * (max(cfg.PRBSet) + 1)
     dmrs_size = n_dmrs_bits_re * NSizeBWP
 
-    n_scid = 0
+    n_scid = cfg.DMRS.NSCID
 
     occupied_syms = PDSCHDMRSSyms(cfg)
 

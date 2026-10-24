@@ -66,3 +66,17 @@ def test_nr_pdschdmrs(dmrs_add_pos):
     cfg["NSCID"] = 0
 
     run_nr_pdschdmrs(cfg)
+
+
+def test_nr_pdschdmrs_nscid_changes_sequence():
+    carrier = nrCarrierConfig()
+    carrier.NSizeGrid = 52
+
+    pdsch_cfg = nrPDSCHConfig()
+    pdsch_cfg.PRBSet = list(range(52))
+
+    syms_scid0 = nrPDSCHDMRS(pdsch_cfg, carrier)
+    pdsch_cfg.DMRS.NSCID = 1
+    syms_scid1 = nrPDSCHDMRS(pdsch_cfg, carrier)
+
+    assert not np.array_equal(syms_scid0, syms_scid1)
