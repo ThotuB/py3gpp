@@ -77,7 +77,21 @@ def _binToInt(bin: NDArray[np.int_]) -> int:
 
 def nrCRCDecode(blkcrc: NDArray[np.int_], poly: CRCPoly, mask: int = 0) -> tuple[NDArray[np.int_], int]:
     """CRC decoding."""
-    encoded = nrCRCEncode(blkcrc, poly, mask)
-    L = len(encoded) - len(blkcrc)
+    blkcrc = np.asarray(blkcrc).ravel()
+    probe = nrCRCEncode(blkcrc, poly, 0)
+    L = len(probe) - len(blkcrc)
+    if mask:
+        # The standard "recompute CRC over payload+embedded-crc, check for zero" trick only
+        # works when mask == 0: nrCRCEncode's masking XORs mask into its own freshly computed
+        # remainder *after* an extra x^L shift, which does not invert cleanly when re-encoding
+        # the full (payload + masked crc) blob. Unmask the embedded CRC bits back to their raw
+        # (unmasked) form first, so the usual zero-check applies correctly for any mask.
+        received_crc_int = 0
+        for bit in blkcrc[-L:]:
+            received_crc_int = (received_crc_int << 1) | int(bit)
+        raw_crc_int = received_crc_int ^ mask
+        raw_crc_bits = [(raw_crc_int >> (L - i - 1)) & 1 for i in range(L)]
+        blkcrc = np.concatenate([blkcrc[:-L], np.array(raw_crc_bits, int)])
+    encoded = nrCRCEncode(blkcrc, poly, 0)
     crc = encoded[-L:]
     return encoded[: len(blkcrc) - L], _binToInt(crc)

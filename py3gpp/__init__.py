@@ -1,7 +1,9 @@
 from .dl.ch.phy.pbch import nrPBCH, nrPBCHIndices, nrPBCHPRBS
+from .dl.ch.phy.pdcch import nrPDCCH, nrPDCCHDecode, nrPDCCHPRBS
 from .dl.ch.phy.pdsch import nrPDSCH, nrPDSCHConfig, nrPDSCHDecode, nrPDSCHDMRSConfig, nrPDSCHIndices, nrPDSCHPTRSConfig
 from .dl.ch.trs.bch import nrBCH, nrBCHDecode
 from .dl.ch.trs.dlsch import nrDLSCHInfo
+from .dl.dci import nrDCIDecode, nrDCIEncode
 from .dl.ofdm import (
     nrCarrierConfig,
     nrNumerologyConfig,
