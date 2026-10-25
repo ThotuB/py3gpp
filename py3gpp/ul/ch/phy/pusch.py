@@ -8,6 +8,7 @@ from numpy.typing import NDArray
 from py3gpp.dl.ofdm import nrCarrierConfig
 from py3gpp.plc.sym import nrPRBS, nrSymbolDemodulate, nrSymbolModulate, nrTransformDeprecode, nrTransformPrecode
 from py3gpp.ul.sig.pusch_dmrs import PUSCHDMRSSyms
+from py3gpp.ul.sig.pusch_ptrs import nrPUSCHPTRSConfig
 
 
 class CommonConfig:
@@ -175,10 +176,20 @@ class nrPUSCHConfig(PUSCHConfigBase, CommonConfig):
         self._Nid: int = 0
         self._NSizeBWP: int | None = None
         self._NStartBWP: int | None = None
+        self._EnablePTRS: bool = False
+        self.PTRS: nrPUSCHPTRSConfig = nrPUSCHPTRSConfig()
 
     @property
     def NRBSize(self) -> int:
         return 12
+
+    @property
+    def EnablePTRS(self) -> bool:
+        return self._EnablePTRS
+
+    @EnablePTRS.setter
+    def EnablePTRS(self, value: bool) -> None:
+        self._EnablePTRS = value
 
     @property
     def Nid(self) -> int:

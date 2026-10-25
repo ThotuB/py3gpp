@@ -25,6 +25,7 @@ from .dl.sig.csirs import nrCSIRS, nrCSIRSConfig, nrCSIRSIndices
 from .dl.sig.pbch_dmrs import nrPBCHDMRS, nrPBCHDMRSIndices
 from .dl.sig.pdsch_dmrs import nrPDSCHDMRS, nrPDSCHDMRSIndices
 from .dl.sig.pdsch_ptrs import nrPDSCHPTRS, nrPDSCHPTRSIndices
+from .dl.sig.prs import nrPRS, nrPRSConfig, nrPRSIndices
 from .dl.sig.ss import nrPSS, nrPSSIndices, nrSSS, nrSSSIndices
 from .plc.sym import (
     nrLayerMap,
@@ -69,4 +70,5 @@ from .ul.ch.phy.pusch import nrPUSCH, nrPUSCHConfig, nrPUSCHDecode, nrPUSCHDMRSC
 from .ul.ch.trs.uci import nrUCIDecode, nrUCIEncode
 from .ul.ch.trs.ulsch import nrULSCHInfo
 from .ul.sig.pusch_dmrs import nrPUSCHDMRS, nrPUSCHDMRSIndices
+from .ul.sig.pusch_ptrs import nrPUSCHPTRS, nrPUSCHPTRSConfig, nrPUSCHPTRSIndices
 from .ul.sig.srs import nrSRS, nrSRSConfig, nrSRSIndices
