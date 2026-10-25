@@ -59,6 +59,8 @@ from .ul.ch.phy.pucch import (
     nrPUCCH3Config,
     nrPUCCH4,
     nrPUCCH4Config,
+    nrPUCCHDMRS,
+    nrPUCCHDMRSIndices,
     nrPUCCHHoppingInfo,
     nrPUCCHIndices,
     nrPUCCHPRBS,

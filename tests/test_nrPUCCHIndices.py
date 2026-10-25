@@ -71,6 +71,31 @@ def test_nrPUCCHIndices_format2_matches_matlab():
     assert len(np.unique(ind)) == ind.size
 
 
+def test_nrPUCCHIndices_nonzero_nstartgrid_matches_matlab():
+    # Regression test: the carrier/BWP offset must be (NStartBWP - NStartGrid), not raw
+    # NStartBWP -- caught via a live MATLAB cross-check with NStartGrid != 0 (every earlier
+    # PUCCH test used NStartGrid=0, which masked this). Reference indices from MATLAB.
+    carrier = nrCarrierConfig()
+    carrier.SubcarrierSpacing = 15
+    carrier.NSizeGrid = 106
+    carrier.NStartGrid = 10
+    carrier.NSlot = 3
+
+    pucch = nrPUCCH0Config()
+    pucch.SymbolAllocation = [11, 2]
+    pucch.PRBSet = list(range(2, 6))
+    pucch.FrequencyHopping = "intraSlot"
+    pucch.SecondHopStartPRB = 10
+    pucch.GroupHopping = "enable"
+    pucch.HoppingID = 100
+    pucch.InitialCyclicShift = 3
+
+    ind = nrPUCCHIndices(carrier, pucch)
+    assert ind.shape == (96,)
+    assert ind[0] == 14016
+    assert len(np.unique(ind)) == ind.size
+
+
 def test_nrPUCCHIndices_within_grid_bounds():
     carrier = _carrier()
     pucch = nrPUCCH0Config()
