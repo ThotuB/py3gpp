@@ -4,7 +4,7 @@ Function/class inventory crawled from the MathWorks 5G Toolbox documentation (`m
 
 Sub-groupings below (H4 headers) mirror the exact bold group labels MathWorks uses on each page (e.g. "CRC Operations", "Physical Broadcast Channel"). Where a page presents its functions as one flat list with no such labels, it's kept as a single table.
 
-**Summary: 79 of 136 unique functions/classes implemented (~58%).** Uplink now has PUSCH (single-layer, `MappingType="A"` only), `nrULSCHInfo`, and PRACH (long preambles, Formats 0-2, unrestricted set, FR1 only); PUCCH, SRS, and UCI remain entirely unimplemented. PDCCH/DCI has channel coding, modulation, and non-interleaved resource mapping, but not search-space candidate hashing; CSI-RS covers only Rows 1-3 of its 18-row resource-mapping table (see Notable gaps). Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
+**Summary: 84 of 136 unique functions/classes implemented (~62%).** Uplink now has PUSCH (single-layer, `MappingType="A"` only), `nrULSCHInfo`, PRACH (long preambles, Formats 0-2, unrestricted set, FR1 only), UCI encode/decode (single codeword only), and SRS (no hopping/TDM); PUCCH remains entirely unimplemented. PDCCH/DCI has channel coding, modulation, and non-interleaved resource mapping, but not search-space candidate hashing; CSI-RS covers only Rows 1-3 of its 18-row resource-mapping table (see Notable gaps). Status is matched by exact function/class name existing under `py3gpp/` — files are now grouped by category, so several related functions typically live together in one merged module (e.g. `nrBCH`/`nrBCHDecode` both live in `dl/ch/trs/bch.py`). A function marked ❌ may still be partially covered inline inside another file (noted where relevant), but has no standalone implementation.
 
 ---
 
@@ -183,9 +183,9 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrSRS` | Generate uplink SRS symbols | ❌ |
-| `nrSRSIndices` | Generate uplink SRS resource element indices | ❌ |
-| `nrSRSConfig` | SRS configuration parameters | ❌ |
+| `nrSRS` | Generate uplink SRS symbols | ✅ `ul/sig/srs.py` (no frequency/comb/cyclic-shift hopping, no 8-port TDM, see Notable gaps) |
+| `nrSRSIndices` | Generate uplink SRS resource element indices | ✅ `ul/sig/srs.py` (same scope as `nrSRS`) |
+| `nrSRSConfig` | SRS configuration parameters | ✅ `ul/sig/srs.py` |
 
 ### Uplink Physical Channels
 
@@ -268,8 +268,8 @@ _No sub-grouping on this page — flat function list._
 
 | Function | Description | Status |
 |---|---|---|
-| `nrUCIEncode` | Encode uplink control information (UCI) | ❌ |
-| `nrUCIDecode` | Decode uplink control information (UCI) | ❌ |
+| `nrUCIEncode` | Encode uplink control information (UCI) | ✅ `ul/ch/trs/uci.py` (single codeword only, Polar path requires nmax 9/10, see Notable gaps) |
+| `nrUCIDecode` | Decode uplink control information (UCI) | ✅ `ul/ch/trs/uci.py` (same scope as `nrUCIEncode`) |
 
 ### Uplink OFDM Modulation
 
@@ -316,8 +316,8 @@ _No sub-grouping on this page — flat function list._
 |---|---|---|
 | `nrPolarEncode` | Polar encoding | ✅ `plc/trs/polar.py` |
 | `nrPolarDecode` | Polar decoding | ✅ `plc/trs/polar.py` |
-| `nrRateMatchPolar` | Rate matching for Polar encoded data | ✅ `plc/trs/polar.py` |
-| `nrRateRecoverPolar` | Recover rate matched Polar data | ✅ `plc/trs/polar.py` |
+| `nrRateMatchPolar` | Rate matching for Polar encoded data | ✅ `plc/trs/polar.py` (repetition only, `N<=E`; puncturing/shortening is `N>E` and not yet implemented; the uplink `ibil` triangular interleaver is now supported) |
+| `nrRateRecoverPolar` | Recover rate matched Polar data | ✅ `plc/trs/polar.py` (same scope as `nrRateMatchPolar`) |
 
 #### Reference Functions
 
@@ -335,7 +335,7 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch; unl
 | Function | Description | Status |
 |---|---|---|
 | `nrPRBS` | Generate PRBS | ✅ `plc/sym.py` |
-| `nrLowPAPRS` | Generate low peak-to-average power ratio (low-PAPR) sequence | ✅ `plc/sym.py` |
+| `nrLowPAPRS` | Generate low peak-to-average power ratio (low-PAPR) sequence | ✅ `plc/sym.py` (Type 1 only — TS 38.211 5.2.2; Type 2, the `cinit`-based variant for R16 transform-precoded PUSCH DM-RS/PUCCH 3-4, is unimplemented) |
 | `nrSymbolModulate` | Generate modulated symbols | ✅ `plc/sym.py` |
 | `nrSymbolDemodulate` | Demodulate and convert symbols to bits | ✅ `plc/sym.py` |
 | `nrLayerMap` | Layer mapping of modulated and scrambled codewords | ✅ `plc/sym.py` |
@@ -378,7 +378,7 @@ _No sub-grouping on this page — flat function list (confirmed by re-fetch)._
 
 ## Notable gaps worth prioritizing
 
-- **Uplink: PUSCH, PRACH (long preambles only), and `nrULSCHInfo`.** PUSCH (`ul/ch/phy/pusch.py`) is single-layer, `MappingType="A"`, `DMRSConfigurationType=1` only (same real limitations `nrPDSCH`/`nrPDSCHDMRS` have). `nrPUSCHCodebook` (MIMO precoding) is unimplemented since multi-layer PUSCH isn't supported yet. PRACH (`ul/ch/phy/prach.py`) covers long preambles (Formats 0-2, `L_RA=839`) with the unrestricted cyclic-shift set, FR1 only — verified against a live MATLAB 5G Toolbox session (exact sequence/indices/OFDM-info match for Formats 0-2, plus the full embedded root-sequence and FR1 config tables transcribed directly from the toolbox source, since 3GPP numeric tables aren't copyrightable MathWorks expression). Deferred: Format 3 (5 kHz, fractional slot-duration semantics not yet verified), short preambles (`L_RA=139/571/1151`), restricted sets Type A/B, FR2, `nrPRACHOFDMInfo` beyond Format 0/`StartingSymbol=0` (the general case needs the `getSubframeAdjustment` subframe-straddling logic, which is substantial), and `nrPRACHOFDMModulate`/`nrPRACHGrid`/`nrPRACHDetect` entirely. PUCCH (all 5 formats), SRS, UCI, and UL-SCH multiplexing/demultiplexing are entirely unimplemented.
+- **Uplink: PUSCH, PRACH (long preambles only), UCI, and `nrULSCHInfo`.** PUSCH (`ul/ch/phy/pusch.py`) is single-layer, `MappingType="A"`, `DMRSConfigurationType=1` only (same real limitations `nrPDSCH`/`nrPDSCHDMRS` have). `nrPUSCHCodebook` (MIMO precoding) is unimplemented since multi-layer PUSCH isn't supported yet. PRACH (`ul/ch/phy/prach.py`) covers long preambles (Formats 0-2, `L_RA=839`) with the unrestricted cyclic-shift set, FR1 only — verified against a live MATLAB 5G Toolbox session (exact sequence/indices/OFDM-info match for Formats 0-2, plus the full embedded root-sequence and FR1 config tables transcribed directly from the toolbox source, since 3GPP numeric tables aren't copyrightable MathWorks expression). Deferred: Format 3 (5 kHz, fractional slot-duration semantics not yet verified), short preambles (`L_RA=139/571/1151`), restricted sets Type A/B, FR2, `nrPRACHOFDMInfo` beyond Format 0/`StartingSymbol=0` (the general case needs the `getSubframeAdjustment` subframe-straddling logic, which is substantial), and `nrPRACHOFDMModulate`/`nrPRACHGrid`/`nrPRACHDetect` entirely. `nrUCIEncode`/`nrUCIDecode` (`ul/ch/trs/uci.py`) cover repetition/simplex/Reed-Muller (`A=1..11`) and single-codeword Polar (`A=20..359`, verified bit-exact against a live MATLAB session) — along the way, fixed a real pre-existing gap in `nrRateMatchPolar`/`nrRateRecoverPolar` (the uplink-only `ibil` triangular interleaver was previously unimplemented). Deferred: the `A=12..19` 6-bit-CRC range (TS 38.212's own formula always resolves to Polar `nmax=8` there, but this repo's `nrPolarDecode` only supports `nmax` 9 or 10 — a pre-existing limitation, not new), two-codeword segmentation (`A>=1013`, or `A>=360` with `Euci>=1088`), and any `(A, Euci)` combination whose resolved `N` exceeds `Euci` (puncturing/shortening, same pre-existing `nrRateMatchPolar` gap PRACH/DCI already work around). SRS (`ul/sig/srs.py`) covers the single-resource, fixed-bandwidth case — verified bit-exact against two live MATLAB sessions (2-port/comb-2 and 4-port/comb-4, including nonzero `CyclicShift`/`FrequencyStart`/`NRRC`). Deferred: frequency hopping (`BHop<BSRS`, the odd/even-`Nb` `F_b` formula), comb-offset hopping, cyclic-shift hopping, 8-port TDM, Rel-17 partial frequency sounding, SRS positioning, and `GroupSeqHopping` other than `"neither"` — all raise `NotImplementedError`. Along the way, found and fixed a real scope bug: `nrLowPAPRS` had been added during the PRACH work as a narrow `nrLowPAPRS(u, length)` (just the bare Zadoff-Chu formula) — but PRACH actually calls MATLAB's bare `zadoffChuSeq` directly, not `nrLowPAPRS`. The *real* `nrLowPAPRS(u,v,alpha,m)` (now correctly implemented in `plc/sym.py`, Type 1 only) is the richer group/sequence/cyclic-shift generator SRS actually needs. PUCCH remains entirely unimplemented, as does UL-SCH multiplexing/demultiplexing.
 - **PDCCH/DCI: channel coding, modulation, and non-interleaved resource mapping only** (`nrDCIEncode`/`nrDCIDecode`, `nrPDCCH`/`nrPDCCHDecode`/`nrPDCCHPRBS`, `nrPDCCHConfig`/`nrCORESETConfig`/`nrSearchSpaceConfig`, `nrPDCCHResources`). Still deferred: interleaved CCE-to-REG mapping (`nrPDCCHResources` raises `NotImplementedError` for `CCEREGMapping="interleaved"`) and search-space candidate hashing per TS 38.213 §10.1 (`nrPDCCHSpace`) — low confidence in exact formula recall for both, and no bundled MATLAB reference data to validate against.
 - **CSI-RS: Rows 1-3 of 18 only** (`nrCSIRS`/`nrCSIRSIndices`/`nrCSIRSConfig` in `dl/sig/csirs.py`) — 1-port (density `'three'`/`'one'`) and 2-port fd-CDM2. Rows 4-18 (4/8/12/16/24/32-port, CDM4/CDM8, multi-frequency-group patterns) raise `NotImplementedError`: the exact k-offset combinations in TS 38.211 Table 7.4.1.5.3-1 couldn't be verified without a live MATLAB session or the spec text itself (MathWorks docs only cite the table, they don't reproduce it). ZP (zero-power/muted) CSI-RS is also unimplemented. `nrCSIReportConfig` is unimplemented — it's a pure CQI/PMI/RI feedback-reporting parameter container with no consuming function anywhere in this repo (no uplink, no CSI measurement/reporting processing exists at all).
 - **No channel models** (CDL/TDL/HST) — only path loss is covered.

@@ -10,9 +10,17 @@ from numpy.typing import NDArray
 
 from py3gpp import codes
 from py3gpp.dl.ofdm import nrCarrierConfig
-from py3gpp.plc.sym import nrLowPAPRS
 
 LRA = 839
+
+
+def _zadoffChuSeq(u: int, n: int) -> NDArray[np.complex128]:
+    """Bare Zadoff-Chu sequence (TS 38.211 5.2.2 base formula). PRACH uses this directly
+    (matching MATLAB's own `zadoffChuSeq`), not the generic `nrLowPAPRS` (which decomposes a
+    sequence via group/sequence numbers (u,v) and is used by SRS/PUCCH/PUSCH DM-RS instead)."""
+    m = np.arange(n)
+    return np.exp(-1j * np.pi * u * m * (m + 1) / n)
+
 
 # TS 38.211 Table 6.3.3.1-1 (long preambles, L_RA=839). PRACHDuration is N_u / N_u(format 0),
 # i.e. how many "format 0 units" the preamble sequence spans (confirmed against a live
@@ -283,7 +291,7 @@ def nrPRACH(carrier: nrCarrierConfig, prach: nrPRACHConfig) -> tuple[NDArray[np.
     u, C_v, numCyclicShifts = _getPreambleSeqParameters(prach)
     info = {"RootSequence": u, "CyclicShift": C_v, "NumCyclicShifts": numCyclicShifts}
 
-    x_u = nrLowPAPRS(u, LRA)
+    x_u = _zadoffChuSeq(u, LRA)
     x_uv = np.roll(x_u, -C_v)
     y_uv = np.fft.fft(x_uv)
 

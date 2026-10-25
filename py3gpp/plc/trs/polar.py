@@ -166,6 +166,36 @@ def subblock_interleaving(u: NDArray[np.int_]) -> NDArray[np.int_]:
     return y
 
 
+def _triangularInterleavePattern(E: int) -> NDArray[np.int_]:
+    """TS 38.212 5.4.1.3 triangular (uplink) coded-bit interleaver: out[k] = in[pattern[k]]."""
+    T = int(np.ceil((-1 + np.sqrt(1 + 8 * E)) / 2))
+    v = np.full((T, T), -1, dtype=int)
+    k = 0
+    for i in range(T):
+        for j in range(T - i):
+            if k < E:
+                v[i, j] = k
+            k += 1
+    pattern = np.zeros(E, dtype=int)
+    k = 0
+    for j in range(T):
+        for i in range(T - j):
+            if v[i, j] != -1:
+                pattern[k] = v[i, j]
+                k += 1
+    return pattern
+
+
+def _triangularInterleave(bits: NDArray[np.int_]) -> NDArray[np.int_]:
+    return bits[_triangularInterleavePattern(bits.shape[0])]
+
+
+def _triangularDeinterleave(bits: NDArray[np.floating]) -> NDArray[np.floating]:
+    out = np.zeros_like(bits)
+    out[_triangularInterleavePattern(bits.shape[0])] = bits
+    return out
+
+
 def nrRateMatchPolar(enc: NDArray[np.int_], K: int, E: int, ibil: bool = False) -> NDArray[np.int_]:
     """Rate matching for Polar encoded data."""
     # TODO: for what is the parameter K??
@@ -182,9 +212,9 @@ def nrRateMatchPolar(enc: NDArray[np.int_], K: int, E: int, ibil: bool = False) 
         # TODO: implement shortening und puncturing
         print("Error!")
         exit()
-    if ibil == True:
-        print("Error: interleaving of coded bits is not implemented!")
-        exit()
+    if ibil:
+        # TS 38.212 5.4.1.3: uplink-only triangular coded-bit interleaver
+        y = _triangularInterleave(y)
     return y
 
 
@@ -192,6 +222,10 @@ def nrRateRecoverPolar(
     llr: NDArray[np.floating], K: int, N: int, ibil: bool = False, discardRepetition: bool = True
 ) -> NDArray[np.floating]:
     """Recover rate matched Polar data."""
+    if ibil:
+        # TS 38.212 5.4.1.3: undo the uplink-only triangular coded-bit interleaver first,
+        # since it was the last step applied during rate matching
+        llr = _triangularDeinterleave(llr)
     E = llr.shape[0]
     if N <= E:
         # undo repetition
@@ -202,9 +236,6 @@ def nrRateRecoverPolar(
     else:
         # TODO: implement shortening und puncturing
         print("Error!")
-        exit()
-    if ibil == True:
-        print("Error: interleaving of coded bits is not implemented!")
         exit()
     d = np.zeros(N)
     np.put(d, subblock_interleaving(np.arange(N)), y)

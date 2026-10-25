@@ -49,5 +49,7 @@ from .plc.trs.ref import nrPDSCHMCSTables, nrTBS
 from .rx import nrChannelEstimate, nrEqualizeMMSE, nrExtractResources, nrPathLoss, nrPathLossConfig, nrTimingEstimate
 from .ul.ch.phy.prach import nrPRACH, nrPRACHConfig, nrPRACHIndices, nrPRACHOFDMInfo
 from .ul.ch.phy.pusch import nrPUSCH, nrPUSCHConfig, nrPUSCHDecode, nrPUSCHDMRSConfig, nrPUSCHIndices, nrPUSCHPRBS
+from .ul.ch.trs.uci import nrUCIDecode, nrUCIEncode
 from .ul.ch.trs.ulsch import nrULSCHInfo
 from .ul.sig.pusch_dmrs import nrPUSCHDMRS, nrPUSCHDMRSIndices
+from .ul.sig.srs import nrSRS, nrSRSConfig, nrSRSIndices
