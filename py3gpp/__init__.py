@@ -48,6 +48,21 @@ from .plc.trs.polar import nrPolarDecode, nrPolarEncode, nrRateMatchPolar, nrRat
 from .plc.trs.ref import nrPDSCHMCSTables, nrTBS
 from .rx import nrChannelEstimate, nrEqualizeMMSE, nrExtractResources, nrPathLoss, nrPathLossConfig, nrTimingEstimate
 from .ul.ch.phy.prach import nrPRACH, nrPRACHConfig, nrPRACHIndices, nrPRACHOFDMInfo
+from .ul.ch.phy.pucch import (
+    nrPUCCH0,
+    nrPUCCH0Config,
+    nrPUCCH1,
+    nrPUCCH1Config,
+    nrPUCCH2,
+    nrPUCCH2Config,
+    nrPUCCH3,
+    nrPUCCH3Config,
+    nrPUCCH4,
+    nrPUCCH4Config,
+    nrPUCCHHoppingInfo,
+    nrPUCCHIndices,
+    nrPUCCHPRBS,
+)
 from .ul.ch.phy.pusch import nrPUSCH, nrPUSCHConfig, nrPUSCHDecode, nrPUSCHDMRSConfig, nrPUSCHIndices, nrPUSCHPRBS
 from .ul.ch.trs.uci import nrUCIDecode, nrUCIEncode
 from .ul.ch.trs.ulsch import nrULSCHInfo
