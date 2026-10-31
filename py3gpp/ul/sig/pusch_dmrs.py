@@ -51,7 +51,10 @@ def PUSCHDMRSSyms(cfg: nrPUSCHConfig) -> NDArray[np.int_]:
     assert cfg.MappingType in ["A"], "Mapping type B is not yet implemented"
     l1 = 11
     typeA_pos = cfg.DMRS.DMRSTypeAPosition
-    sym_alloc = cfg.SymbolAllocation[1]
+    # TS 38.211 Table 6.4.1.1.3-3/-4: indexed by l_d, the duration from the start of the slot to
+    # the end of the PUSCH allocation -- not just the number of allocated symbols -- so symStart
+    # must be included when mapping type A does not start at symbol 0.
+    sym_alloc = cfg.SymbolAllocation[0] + cfg.SymbolAllocation[1]
     add_pos = cfg.DMRS.DMRSAdditionalPosition
     dmrs_len = cfg.DMRS.DMRSLength
 
