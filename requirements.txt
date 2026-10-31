@@ -1,7 +1,0 @@
-# dependencies moved into pyproject.toml, this file willl become obsolete
-# only dev dependencies are still here
-pylint
-anybadge
-pytest
-pytest-xdist
-importlib_resources

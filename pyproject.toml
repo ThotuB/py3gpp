@@ -36,3 +36,20 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/ThotuB/py3gpp"
+
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-xdist",
+]
+dev = [
+    {include-group = "test"},
+    "black",
+    "isort",
+    "pylint",
+    "anybadge",
+]
+matlab = [
+    {include-group = "test"},
+    "matlabengine>=26.2.4",
+]
