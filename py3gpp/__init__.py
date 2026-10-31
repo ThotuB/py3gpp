@@ -37,6 +37,13 @@ from .dl.sig.pdsch_ptrs import nrPDSCHPTRS, nrPDSCHPTRSIndices
 from .dl.sig.prs import nrPRS, nrPRSConfig, nrPRSIndices
 from .dl.sig.ss import nrPSS, nrPSSIndices, nrSSS, nrSSSIndices
 from .dl.sig.ssb import nrSSBurstStartSymbols
+from .dl.wavegen import (
+    nrDLCarrierConfig,
+    nrDLCarrierGenerate,
+    nrSSBurstConfig,
+    nrWavegenPDCCHConfig,
+    nrWavegenPDSCHConfig,
+)
 from .plc.sym import (
     nrLayerMap,
     nrLowPAPRS,
