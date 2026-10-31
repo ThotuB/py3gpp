@@ -51,5 +51,9 @@ dev = [
 ]
 matlab = [
     {include-group = "test"},
-    "matlabengine>=26.2.4",
+    # Pin this to the matlabengine release matching your local MATLAB version (check
+    # `pip index versions matlabengine`) -- it does not track MATLAB release names 1:1,
+    # and only supports Python 3.9-3.13. If no matching wheel exists, install from
+    # <matlabroot>/extern/engines/python instead (requires a supported Python).
+    "matlabengine",
 ]

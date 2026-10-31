@@ -1,6 +1,7 @@
 import itertools
 
 import matlab.engine
+from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -28,6 +29,7 @@ def run_nr_pbch_dmrs(ncellid, issb, eng):
 @pytest.fixture(scope="session")
 def eng():
     eng = matlab.engine.connect_matlab()
+    assert isinstance(eng, MatlabEngine)
     yield eng
     eng.quit()
 
