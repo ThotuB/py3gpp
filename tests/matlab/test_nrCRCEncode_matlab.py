@@ -30,9 +30,3 @@ def eng():
 @pytest.mark.parametrize("blk_size", [100, 2000])
 def test_nr_crc_encode_matlab(poly, blk_size, eng):
     run_nr_crc_encode(poly, blk_size, eng)
-
-
-if __name__ == "__main__":
-    _eng = matlab.engine.connect_matlab()
-    test_nr_crc_encode("6", 100, _eng)
-    _eng.quit()

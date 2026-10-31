@@ -26,13 +26,3 @@ def test_nrLDPCEncode_matlab(K, C, F, bgn, eng):
     codedcbs = nrLDPCEncode(cbs, bgn)
     assert codedcbs_ref.shape == codedcbs.shape
     assert np.array_equal(codedcbs, codedcbs_ref)
-
-
-if __name__ == "__main__":
-    _eng = matlab.engine.connect_matlab()
-    bgn = 2
-    C = 2
-    K = 2560
-    F = 36
-    test_nrLDPCEncode(K, C, F, bgn, _eng)
-    _eng.quit()

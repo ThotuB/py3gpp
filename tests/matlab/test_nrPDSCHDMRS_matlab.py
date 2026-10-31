@@ -71,9 +71,3 @@ def test_nr_pdschdmrs_matlab(symb_alloc, dmrs_add_pos, typeA_pos, PRBSet, dmrs_c
     cfg["EnablePTRS"] = 0
 
     run_nr_pdschdmrs(cfg, eng)
-
-
-if __name__ == "__main__":
-    _eng = matlab.engine.connect_matlab()
-    test_nr_pdschdmrs([2, 12], 1, 2, list(range(2, 130)), 2, _eng)
-    _eng.quit()

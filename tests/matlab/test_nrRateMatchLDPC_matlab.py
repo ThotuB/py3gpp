@@ -31,15 +31,3 @@ def test_nrRateMatchLDPC_matlab(N, C, rv, mod, nLayers, N_filler_bits, eng):
     if N_filler_bits > 1:
         in_[-N_filler_bits:, :] = np.ones((N_filler_bits, C)) * (-1)
     run_nrRateMatchLDPC(in_, outlen, rv, mod, nLayers, eng)
-
-
-if __name__ == "__main__":
-    _eng = matlab.engine.connect_matlab()
-    N = 3960
-    C = 1
-    rv = 0
-    mod = "QPSK"
-    nLayers = 1
-    N_filler_bits = 20
-    test_nrRateMatchLDPC_matlab(N, C, rv, mod, nLayers, N_filler_bits, _eng)
-    _eng.quit()

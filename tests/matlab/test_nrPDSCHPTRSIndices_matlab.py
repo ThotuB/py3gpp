@@ -85,9 +85,3 @@ def test_nr_pdschptrs_indices_matlab(
     cfg["PTRSREOffset"] = PTRSREOffset
 
     run_nr_pdschptrs_indices(cfg, eng)
-
-
-if __name__ == "__main__":
-    _eng = matlab.engine.connect_matlab()
-    test_nr_pdschptrs_indices(2, [2, 12], 3, list(range(0, 132)), 1, "00", 2, 4, _eng)
-    _eng.quit()

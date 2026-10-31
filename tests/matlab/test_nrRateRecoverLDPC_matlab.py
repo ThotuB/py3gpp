@@ -35,15 +35,3 @@ def test_nrRateRecoverLDPC_matlab(N, trblklen, R, rv, mod, nLayers, numCB, eng):
     ref_data = np.asarray(ref_data)
     out_data = nrRateRecoverLDPC(sbits, trblklen, R, rv, mod, nLayers, numCB)
     assert np.array_equal(ref_data, out_data)
-
-
-if __name__ == "__main__":
-    _eng = matlab.engine.connect_matlab()
-    trblklen = 4000
-    R = 0.5
-    rv = 1
-    mod = "QPSK"
-    nLayers = 1
-    numCB = 1
-    test_nrRateRecoverLDPC_matlab(4500, trblklen, R, rv, mod, nLayers, numCB, _eng)
-    _eng.quit()

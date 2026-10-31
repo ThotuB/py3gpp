@@ -34,13 +34,3 @@ def test_nrLDPCDecode_matlab(K, C, F, bgn, vectorize, eng):
 
     [rxcbs, actualniters] = nrLDPCDecode(rxcodedcbs.copy(), bgn, 20, vectorize=vectorize)
     np.array_equal(rxcbs, cbs)
-
-
-if __name__ == "__main__":
-    _eng = matlab.engine.connect_matlab()
-    bgn = 2
-    C = 2
-    K = 2560
-    F = 36
-    test_nrLDPCDecode(K, C, F, bgn, 0, _eng)
-    _eng.quit()
