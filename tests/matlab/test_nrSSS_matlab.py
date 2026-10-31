@@ -1,7 +1,6 @@
 import itertools
 
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -21,14 +20,6 @@ def run_nr_sss(ncellid, eng):
 
     assert (ref_data == data).all()
     assert (indices == ref_ind).all()
-
-
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
 
 
 @pytest.mark.parametrize("ncellid", [0, 600, 1007])

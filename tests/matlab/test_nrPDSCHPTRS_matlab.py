@@ -3,7 +3,6 @@ import os
 import time
 
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -47,14 +46,6 @@ def run_nr_pdschptrs(cfg, eng):
     data_ref = np.around(data_ref, 4)
 
     assert np.array_equal(pdschptrs_syms, data_ref)
-
-
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
 
 
 @pytest.mark.parametrize("typeA_pos", [2, 3])

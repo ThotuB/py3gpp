@@ -1,7 +1,6 @@
 import itertools
 
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -24,14 +23,6 @@ def run_nr_mapper(databits, modtype, eng):
     assert (ref_data == data).all()
 
 
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
-
-
 @pytest.mark.parametrize("modtype", ["BPSK", "pi/2-BPSK", "QPSK", "16QAM", "64QAM", "256QAM"])
 def test_nr_pbch_matlab(modtype, eng):
     if modtype == "BPSK":
@@ -46,5 +37,7 @@ def test_nr_pbch_matlab(modtype, eng):
         databits = get_bin_symbols(6, 64)
     elif modtype == "256QAM":
         databits = get_bin_symbols(8, 256)
+    else:
+        raise AssertionError(f"unreachable: unsupported modtype {modtype}")
 
     run_nr_mapper(databits, modtype, eng)

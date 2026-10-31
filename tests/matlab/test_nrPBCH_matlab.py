@@ -1,7 +1,6 @@
 import itertools
 
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -25,14 +24,6 @@ def run_nr_pbch(ncellid, databits, v, eng):
 
     assert np.all(ref_data == data)
     assert np.all(ref_indices == indices)
-
-
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
 
 
 @pytest.mark.parametrize("ncellid", [0, 500, 1007])

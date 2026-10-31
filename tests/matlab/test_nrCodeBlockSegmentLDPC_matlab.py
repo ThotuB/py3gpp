@@ -3,7 +3,6 @@ import os
 import sys
 
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -31,14 +30,6 @@ def run_nrCodeBlockSegmentLDPC(blklen, eng):
 
     out_cbs = nrCodeBlockSegmentLDPC(in_blk, bgn)
     assert np.array_equal(ref_cbs, out_cbs)
-
-
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
 
 
 def test_nrCodeBlockSegmentLDPC_fixed_data(eng):

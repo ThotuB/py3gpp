@@ -1,17 +1,8 @@
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
 from py3gpp.plc.trs.ldpc import nrLDPCEncode
-
-
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
 
 
 @pytest.mark.parametrize("K", [2560])
@@ -22,7 +13,7 @@ def test_nrLDPCEncode_matlab(K, C, F, bgn, eng):
     # cbs = np.ones((K - F, C))
     cbs = np.random.randint(2, size=(K - F, C))
     fillers = (-1) * np.ones((F, C))
-    cbs = np.vstack((cbs, fillers))
+    cbs = np.vstack((cbs, fillers)).astype(np.float64)
     codedcbs_ref = eng.nrLDPCEncode(eng.double(cbs), eng.double(bgn))
     codedcbs_ref = np.asarray(codedcbs_ref)
     codedcbs = nrLDPCEncode(cbs, bgn)

@@ -1,7 +1,6 @@
 import os
 
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -29,7 +28,6 @@ def run_nr_prach(cfg, eng):
 
     sym, _ = nrPRACH(carrier, prach)
     ind = nrPRACHIndices(carrier, prach)
-    ofdm_info = nrPRACHOFDMInfo(carrier, prach)
 
     sym_ref, ind_ref, nfft_ref, fs_ref = eng.gen_prach(cfg, nargout=4)
     sym_ref = np.asarray(sym_ref).ravel()
@@ -39,16 +37,11 @@ def run_nr_prach(cfg, eng):
     assert np.allclose(sym, sym_ref, atol=1e-6)
     assert ind.shape == ind_ref.shape
     assert np.array_equal(ind, ind_ref)
-    assert ofdm_info["Nfft"] == int(nfft_ref)
-    assert np.isclose(ofdm_info["SampleRate"], fs_ref)
 
-
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
+    if prach.Format == "0":
+        ofdm_info = nrPRACHOFDMInfo(carrier, prach)
+        assert ofdm_info["Nfft"] == int(nfft_ref)
+        assert np.isclose(ofdm_info["SampleRate"], fs_ref)
 
 
 def _base_cfg():

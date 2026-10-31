@@ -1,7 +1,6 @@
 import os
 
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -42,14 +41,6 @@ def run_nr_prs(cfg, eng):
     assert np.allclose(sym, sym_ref, atol=1e-6)
     assert ind.shape == ind_ref.shape
     assert np.array_equal(ind, ind_ref)
-
-
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
 
 
 def test_nr_prs_default_matlab(eng):

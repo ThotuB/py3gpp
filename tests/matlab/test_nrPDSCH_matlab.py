@@ -1,7 +1,6 @@
 import itertools
 
 import matlab.engine
-from matlab.engine.matlabengine import MatlabEngine
 import numpy as np
 import pytest
 
@@ -17,14 +16,6 @@ def run_nr_pdsch(cws, modulation, nlayers, nid, nrnti, eng):
     data = np.around(data, 4)
 
     assert np.all(ref_data == data)
-
-
-@pytest.fixture(scope="session")
-def eng():
-    eng = matlab.engine.connect_matlab()
-    assert isinstance(eng, MatlabEngine)
-    yield eng
-    eng.quit()
 
 
 @pytest.mark.parametrize("modulation", [["256QAM"], ["64QAM"], ["16QAM"], ["QPSK"]])
