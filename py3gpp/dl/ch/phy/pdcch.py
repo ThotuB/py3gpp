@@ -6,6 +6,7 @@ from typing import Literal, Sequence
 import numpy as np
 from numpy.typing import NDArray
 
+from py3gpp.dl.ch.phy.pdsch import nrPDSCHReservedConfig
 from py3gpp.dl.ofdm import nrCarrierConfig
 from py3gpp.plc.sym import nrPRBS, nrSymbolDemodulate, nrSymbolModulate
 
@@ -94,6 +95,18 @@ class nrCORESETConfig:
             if bit:
                 prbs.extend(range(group * 6, group * 6 + 6))
         return prbs
+
+
+def nrCORESETReservedConfig(coreset: nrCORESETConfig, startSymbol: int = 0) -> nrPDSCHReservedConfig:
+    """Build a PDSCH ReservedPRB entry covering a CORESET's whole configured region (TS 38.214
+    Section 5.1.4.1: PDSCH must assume the entire configured CORESET region is unavailable, not
+    just whichever CCEs end up carrying a DCI in a given monitoring occasion, since the UE can't
+    know that in advance). Set the returned config's Period if the CORESET is monitored on a
+    recurring pattern of slots; leave it unset for a reservation tied to this exact slot only."""
+    rsv = nrPDSCHReservedConfig()
+    rsv.PRBSet = coreset.PRBSet
+    rsv.SymbolSet = list(range(startSymbol, startSymbol + coreset.Duration))
+    return rsv
 
 
 class nrSearchSpaceConfig:

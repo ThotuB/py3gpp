@@ -1,6 +1,7 @@
 from .dl.ch.phy.pbch import nrPBCH, nrPBCHIndices, nrPBCHPRBS
 from .dl.ch.phy.pdcch import (
     nrCORESETConfig,
+    nrCORESETReservedConfig,
     nrPDCCH,
     nrPDCCHConfig,
     nrPDCCHDecode,
