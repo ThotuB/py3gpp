@@ -85,7 +85,7 @@ def _ptrsSyms(carrier: nrCarrierConfig, cfg: nrPUSCHConfig) -> NDArray[np.int_]:
 
     ptrsCnt = td - 1
     occupiedSyms: list[int] = []
-    for i in range(cfg.SymbolAllocation[0], carrier.SymbolsPerSlot):
+    for i in range(cfg.SymbolAllocation[0], cfg.SymbolAllocation[0] + cfg.SymbolAllocation[1]):
         if i == aPos or i in dmrsSyms:
             ptrsCnt = 0
             continue

@@ -8,7 +8,15 @@ from .dl.ch.phy.pdcch import (
     nrPDCCHResources,
     nrSearchSpaceConfig,
 )
-from .dl.ch.phy.pdsch import nrPDSCH, nrPDSCHConfig, nrPDSCHDecode, nrPDSCHDMRSConfig, nrPDSCHIndices, nrPDSCHPTRSConfig
+from .dl.ch.phy.pdsch import (
+    nrPDSCH,
+    nrPDSCHConfig,
+    nrPDSCHDecode,
+    nrPDSCHDMRSConfig,
+    nrPDSCHIndices,
+    nrPDSCHPTRSConfig,
+    nrPDSCHReservedConfig,
+)
 from .dl.ch.trs.bch import nrBCH, nrBCHDecode
 from .dl.ch.trs.dlsch import nrDLSCHInfo
 from .dl.dci import nrDCIDecode, nrDCIEncode
@@ -27,6 +35,7 @@ from .dl.sig.pdsch_dmrs import nrPDSCHDMRS, nrPDSCHDMRSIndices
 from .dl.sig.pdsch_ptrs import nrPDSCHPTRS, nrPDSCHPTRSIndices
 from .dl.sig.prs import nrPRS, nrPRSConfig, nrPRSIndices
 from .dl.sig.ss import nrPSS, nrPSSIndices, nrSSS, nrSSSIndices
+from .dl.sig.ssb import nrSSBurstStartSymbols
 from .plc.sym import (
     nrLayerMap,
     nrLowPAPRS,

@@ -80,3 +80,32 @@ def test_nr_pdschptrs_matlab(
     cfg["PTRSREOffset"] = PTRSREOffset
 
     run_nr_pdschptrs(cfg, eng)
+
+
+@pytest.mark.parametrize("symb_alloc", [[0, 10], [2, 8]])
+def test_nr_pdschptrs_allocation_shorter_than_slot_matlab(symb_alloc, eng):
+    # Regression test: the PT-RS symbol walk must stop at symStart+numSyms, not walk to the end
+    # of the slot -- the latter silently coincides with the former only when the allocation
+    # reaches the slot boundary, which every parametrized case above (symb_alloc=[2,12], ending
+    # at symbol 13 of 14) happened to do.
+    eng.cd(os.path.dirname(__file__))
+
+    cfg = {
+        "n_size_bwp": 132,
+        "n_start_bwp": 0,
+        "MappingType": "A",
+        "DMRSTypeAPosition": 2,
+        "DMRSLength": 1,
+        "DMRSAdditionalPosition": 0,
+        "PRBSet": list(range(132)),
+        "SymbolAllocation": symb_alloc,
+        "DMRSConfigurationType": 1,
+        "NIDNSCID": 1,
+        "NSCID": 0,
+        "RNTI": 1,
+        "EnablePTRS": 1,
+        "PTRSTimeDensity": 1,
+        "PTRSFrequencyDensity": 2,
+        "PTRSREOffset": "00",
+    }
+    run_nr_pdschptrs(cfg, eng)

@@ -92,6 +92,19 @@ def test_nr_puschptrs_dmrs_position_matlab(typeA_pos, add_pos, eng):
     run_nr_puschptrs(cfg, eng)
 
 
+@pytest.mark.parametrize("sym_start,num_syms", [(0, 10), (2, 8)])
+def test_nr_puschptrs_allocation_shorter_than_slot_matlab(sym_start, num_syms, eng):
+    # Regression test: the PT-RS symbol walk must stop at symStart+numSyms, not walk to the end
+    # of the slot -- the latter silently coincides with the former only when the allocation
+    # reaches the slot boundary, which every earlier default-allocation test (ending at symbol
+    # 13 of 14) happened to do.
+    eng.cd(os.path.dirname(__file__))
+    cfg = _base_cfg()
+    cfg["SymbolAllocation"] = [sym_start, num_syms]
+    cfg["PTRSTimeDensity"] = 1
+    run_nr_puschptrs(cfg, eng)
+
+
 def test_nr_puschptrs_disabled_matlab(eng):
     eng.cd(os.path.dirname(__file__))
     cfg = _base_cfg()

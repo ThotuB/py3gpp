@@ -259,11 +259,45 @@ class nrPDSCHPTRSConfig(PDSCHPTRSConfigBase):
         self._PTRSPortSet = size
 
 
+class nrPDSCHReservedConfig:
+    """PDSCH reserved PRB configuration (TS 38.214 Section 5.1.4.1)."""
+
+    def __init__(self) -> None:
+        self._PRBSet: list[int] = []
+        self._SymbolSet: list[int] = []
+        self._Period: int | None = None
+
+    @property
+    def PRBSet(self) -> list[int]:
+        return self._PRBSet
+
+    @PRBSet.setter
+    def PRBSet(self, value: Sequence[int]) -> None:
+        self._PRBSet = list(value)
+
+    @property
+    def SymbolSet(self) -> list[int]:
+        return self._SymbolSet
+
+    @SymbolSet.setter
+    def SymbolSet(self, value: Sequence[int]) -> None:
+        self._SymbolSet = list(value)
+
+    @property
+    def Period(self) -> int | None:
+        return self._Period
+
+    @Period.setter
+    def Period(self, value: int | None) -> None:
+        assert value is None or value > 0, "The value must be a positive integer or None"
+        self._Period = value
+
+
 class PDSCHConfigBase:
     def __init__(self) -> None:
         self._Modulation: Literal["qpsk", "qam16", "qam64", "qam256"] = "qpsk"
         self._NumLayers: int = 1
-        self._ReservedPRB: None = None
+        self._ReservedPRB: list[nrPDSCHReservedConfig] = []
         self._VRBToPRBInterleaving: int = 0
         self._VRBBundleSize: int = 2
 
@@ -289,14 +323,12 @@ class PDSCHConfigBase:
         self._NumLayers = N
 
     @property
-    def ReservedPRB(self) -> None:
-        raise NotImplementedError("not ready yet")
+    def ReservedPRB(self) -> list[nrPDSCHReservedConfig]:
         return self._ReservedPRB
 
     @ReservedPRB.setter
-    def ReservedPRB(self, N: int) -> None:
-        raise NotImplementedError("not ready yet")
-        self._ReservedPRB = None
+    def ReservedPRB(self, value: Sequence[nrPDSCHReservedConfig]) -> None:
+        self._ReservedPRB = list(value)
 
     @property
     def VRBToPRBInterleaving(self) -> int:
@@ -409,16 +441,54 @@ def nrPDSCHDecode(
     return np.array(descrambled_bits)
 
 
+def _activePRBPerSymbol(
+    reservedPRB: Sequence[nrPDSCHReservedConfig],
+    prbset: Sequence[int],
+    symbolset: Sequence[int],
+    nslot: int,
+    nslotsymb: int,
+) -> dict[int, list[int]]:
+    """TS 38.214 5.1.4.1 (nr5g.internal.pdsch.extractActiveResourceBlocks): per-symbol active PRB
+    set within prbset, after removing any PRB reserved (by another channel/signal, e.g. SSB or a
+    CORESET) for that symbol in the current slot."""
+    if not reservedPRB:
+        return {sym: list(prbset) for sym in symbolset}
+
+    reserved: dict[int, set[int]] = {sym: set() for sym in symbolset}
+    for rsv in reservedPRB:
+        if not rsv.SymbolSet or not rsv.PRBSet:
+            continue
+        # Symbols/PRBs can be specified over a multi-slot pattern; project them onto this slot's
+        # local 0..nslotsymb-1 symbol range, honoring the pattern's periodicity (no period means
+        # the pattern doesn't repeat, so it only lines up with its own absolute slot position).
+        offset = (nslot % rsv.Period if rsv.Period else nslot) * nslotsymb
+        reservedSymbols = {s - offset for s in rsv.SymbolSet if 0 <= s - offset < nslotsymb}
+        reservedPRBs = {p for p in rsv.PRBSet if p in prbset}
+        for sym in reservedSymbols:
+            if sym in reserved:
+                reserved[sym].update(reservedPRBs)
+
+    return {sym: [p for p in prbset if p not in reserved[sym]] for sym in symbolset}
+
+
 def nrPDSCHIndices(carrier: nrCarrierConfig, pdsch: nrPDSCHConfig) -> NDArray[np.int_]:
     """Generate PDSCH resource element indices."""
     NStartBWP = carrier.NStartGrid if pdsch.NStartBWP is None else pdsch.NStartBWP
 
-    frame_begin = pdsch.NRBSize * (min(pdsch.PRBSet))
-    frame_end = pdsch.NRBSize * (max(pdsch.PRBSet) + 1)
+    occupied_syms = np.arange(pdsch.SymbolAllocation[0], pdsch.SymbolAllocation[0] + pdsch.SymbolAllocation[1])
+    data_syms = occupied_syms[~np.isin(occupied_syms, PDSCHDMRSSyms(pdsch))]
 
-    occupied_syms = np.arange(pdsch.SymbolAllocation[0], pdsch.SymbolAllocation[1])
-    indices = np.repeat(np.expand_dims(np.arange(frame_begin, frame_end), 0), occupied_syms.shape[0], axis=0)
-    for i in range(indices.shape[0]):
-        indices[i, :] += carrier.NSizeGrid * pdsch.NRBSize * i + NStartBWP * pdsch.NRBSize
-    indices = np.delete(indices, PDSCHDMRSSyms(pdsch), axis=0)
-    return indices.ravel()
+    activePRB = _activePRBPerSymbol(
+        pdsch.ReservedPRB, pdsch.PRBSet, data_syms.tolist(), carrier.NSlot, carrier.SymbolsPerSlot
+    )
+
+    totalSC = carrier.NSizeGrid * pdsch.NRBSize
+    indices = []
+    for sym in data_syms:
+        prbs = np.asarray(activePRB[int(sym)], dtype=int)
+        if prbs.size == 0:
+            continue
+        sc = (NStartBWP + prbs[:, None]) * pdsch.NRBSize + np.arange(pdsch.NRBSize)[None, :]
+        indices.append((sc + sym * totalSC).ravel())
+
+    return np.concatenate(indices) if indices else np.zeros(0, dtype=int)

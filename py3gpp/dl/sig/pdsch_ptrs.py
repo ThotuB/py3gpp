@@ -79,7 +79,7 @@ def PDSCHPTRSSyms(carrier: nrCarrierConfig, cfg: nrPDSCHConfig) -> NDArray[np.in
 
     ptrs_cnt = td - 1
     occupied_syms = np.array([], dtype=int)
-    for i in range(cfg.SymbolAllocation[0], carrier.SymbolsPerSlot):
+    for i in range(cfg.SymbolAllocation[0], cfg.SymbolAllocation[0] + cfg.SymbolAllocation[1]):
         if i == A_pos:
             ptrs_cnt = 0
             continue

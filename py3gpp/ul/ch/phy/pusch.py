@@ -281,9 +281,9 @@ def nrPUSCHIndices(carrier: nrCarrierConfig, pusch: nrPUSCHConfig) -> NDArray[np
     frame_begin = pusch.NRBSize * (min(pusch.PRBSet))
     frame_end = pusch.NRBSize * (max(pusch.PRBSet) + 1)
 
-    occupied_syms = np.arange(pusch.SymbolAllocation[0], pusch.SymbolAllocation[1])
-    indices = np.repeat(np.expand_dims(np.arange(frame_begin, frame_end), 0), occupied_syms.shape[0], axis=0)
-    for i in range(indices.shape[0]):
-        indices[i, :] += carrier.NSizeGrid * pusch.NRBSize * i + NStartBWP * pusch.NRBSize
-    indices = np.delete(indices, PUSCHDMRSSyms(pusch), axis=0)
+    occupied_syms = np.arange(pusch.SymbolAllocation[0], pusch.SymbolAllocation[0] + pusch.SymbolAllocation[1])
+    data_syms = occupied_syms[~np.isin(occupied_syms, PUSCHDMRSSyms(pusch))]
+    indices = np.repeat(np.expand_dims(np.arange(frame_begin, frame_end), 0), data_syms.shape[0], axis=0)
+    for i, sym in enumerate(data_syms):
+        indices[i, :] += carrier.NSizeGrid * pusch.NRBSize * sym + NStartBWP * pusch.NRBSize
     return indices.ravel()
