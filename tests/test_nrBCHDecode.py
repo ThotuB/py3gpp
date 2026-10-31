@@ -1,6 +1,36 @@
 import numpy as np
 
-from py3gpp.dl.ch.trs.bch import nrBCHDecode
+from py3gpp.dl.ch.trs.bch import nrBCH, nrBCHDecode
+
+
+def test_nrBCHDecode_multibeam_msbidxoffset():
+    # Regression test: nrBCHDecode previously hardcoded L_max=8 internally (ignoring the
+    # passed lssb) and never extracted msbidxoffset (always returned 0). Round-trip through
+    # nrBCH with lssb=64 (full SS/PBCH block index 0..63) and lssb=8 (Kssb 0..31) and verify
+    # msbidxoffset recovers floor(idxoffset/8) and floor(idxoffset/16) respectively, matching
+    # the embedding verified against a live MATLAB 5G Toolbox (R2026a) session in nrBCH's test.
+    trblk = np.array([0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0])
+    sfn = 10
+    hrf = 1
+    ncellid = 321
+
+    ssb_idx = 37
+    cdblk64 = nrBCH(trblk, sfn, hrf, 64, ssb_idx, ncellid)
+    softbits64 = 1 - 2 * cdblk64.astype(float)
+    scrblk, crc_result, payload, sfn4lsb, hrf_out, msbidxoffset = nrBCHDecode(softbits64, 8, 64, ncellid)
+    assert crc_result == 0
+    assert hrf_out == hrf
+    assert np.array_equal(payload, trblk)
+    assert msbidxoffset == ssb_idx // 8
+
+    kssb = 18
+    cdblk8 = nrBCH(trblk, sfn, hrf, 8, kssb, ncellid)
+    softbits8 = 1 - 2 * cdblk8.astype(float)
+    scrblk2, crc_result2, payload2, sfn4lsb2, hrf_out2, msbidxoffset2 = nrBCHDecode(softbits8, 8, 8, ncellid)
+    assert crc_result2 == 0
+    assert hrf_out2 == hrf
+    assert np.array_equal(payload2, trblk)
+    assert msbidxoffset2 == kssb // 16
 
 
 def test_nrBCHDecode():

@@ -38,6 +38,18 @@ def nrBCH(trblk: NDArray[np.int_], sfn: int, hrf: int, lssb: int, idxoffset: int
     a[G[j_sfn + 2]] = 1 if sfn & 0x02 != 0 else 0
     a[G[j_sfn + 3]] = 1 if sfn & 0x01 != 0 else 0
 
+    # TS38.212 7.1.1: for lssb==64, idxoffset is the full SS/PBCH block index (0..63) and its
+    # 3 MSBs (bits 5,4,3) go here; otherwise idxoffset is Kssb (0..31) and only its MSB (bit 4)
+    # goes here, with the other 2 bits reserved/zero.
+    if lssb == 64:
+        a[G[11]] = 1 if idxoffset & 0x20 != 0 else 0
+        a[G[12]] = 1 if idxoffset & 0x10 != 0 else 0
+        a[G[13]] = 1 if idxoffset & 0x08 != 0 else 0
+    else:
+        a[G[11]] = 1 if idxoffset & 0x10 != 0 else 0
+        a[G[12]] = 0
+        a[G[13]] = 0
+
     # scramble
     tmp_seq = nrPBCHPRBS(ncellid, 0, len(a) * 100)
     if lssb in (4, 8):
@@ -98,7 +110,7 @@ def nrBCHDecode(
     SFN_3RD_LSB = SFN_PAYLOAD_LENGTH + 1
     v = 2 * scrblk[G[SFN_3RD_LSB]] + scrblk[G[SFN_2ND_LSB]]
 
-    L_max = 8  # TODO: fix this
+    L_max = lssb
     A = 32
     if L_max in (4, 8):
         M = A - 3
@@ -131,5 +143,8 @@ def nrBCHDecode(
             j_other += 1
     lsbotfsfn = np.array([a[G[j_sfn]], a[G[j_sfn + 1]], a[G[j_sfn + 2]], a[G[j_sfn + 3]]])
     hrf = a[G[10]]
-    msbidxoffset = 0  # TODO calculate this
+    if lssb == 64:
+        msbidxoffset = 4 * a[G[11]] + 2 * a[G[12]] + a[G[13]]
+    else:
+        msbidxoffset = a[G[11]]
     return scrblk, crc_result, payload, lsbotfsfn, hrf, msbidxoffset
