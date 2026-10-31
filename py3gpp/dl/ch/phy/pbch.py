@@ -35,7 +35,7 @@ def nrPBCH(ncellid: int, v: int, databits: NDArray[np.int_]) -> NDArray[np.compl
     return np.array(res_sym)
 
 
-def nrPBCHIndices(ibar: int) -> NDArray[np.int_]:
+def nrPBCHIndices(ncellid: int) -> NDArray[np.int_]:
     """Generate PBCH resource element indices."""
     indices = np.hstack((np.arange(240, 480), np.arange(480, 528), np.arange(672, 720), np.arange(720, 960)))
-    return np.setdiff1d(indices, nrPBCHDMRSIndices(ibar))
+    return np.setdiff1d(indices, nrPBCHDMRSIndices(ncellid))
