@@ -125,9 +125,23 @@ def nrChannelEstimate(
                 idx = np.where(temp != 0)[0]
                 H[row, :] = np.interp(np.arange(N), idx, temp[idx])
 
-        # estimate noise variance
-        mean = np.mean((np.abs(H[:, 1]), np.abs(H[:, 3])), axis=0)
-        nVar = np.mean(np.abs(np.abs(H[:, 1]) - mean))
+        # Estimate noise variance via the 2nd-order (discrete-Laplacian) difference between
+        # adjacent pilot REs in frequency, within whichever OFDM symbol(s) actually carry
+        # pilots -- this isolates noise from the smoothly-varying channel without assuming
+        # anything about which columns have pilots (unlike a fixed 2-symbol-DM-RS assumption).
+        # For 3 consecutive pilots with iid noise of variance nVar, Var(h[i+2]-2h[i+1]+h[i]) =
+        # 6*nVar (coefficients 1,-2,1 -> sum of squares 6), so the raw second-difference power
+        # is divided by 6 to recover nVar.
+        lsEst = rxSym / refSym
+        second_diffs = []
+        for col in range(N):
+            idx = np.where(np.logical_and(refInd >= col * K, refInd < (col + 1) * K))[0]
+            if len(idx) < 3:
+                continue
+            order = np.argsort(refInd[idx])
+            vals = lsEst[idx][order]
+            second_diffs.append(vals[2:] - 2 * vals[1:-1] + vals[:-2])
+        nVar = float(np.mean(np.abs(np.concatenate(second_diffs)) ** 2) / 6) if second_diffs else 0.0
 
     elif False:
         H = scipy.interpolate.griddata(

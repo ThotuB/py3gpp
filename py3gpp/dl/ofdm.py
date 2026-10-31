@@ -332,9 +332,27 @@ def nrResourceGrid(carrier: nrCarrierConfig, p: int = 1) -> NDArray[np.complex12
 # this function does not exist in Matlab, but its useful in python because
 # numpy does not support integer indexing across dimensions
 def nrSetResources(ind: NDArray[np.int_], grid: NDArray[Any], vals: NDArray[Any]) -> NDArray[Any]:
-    nSymbols = grid.shape[0]
-    for i in range(grid.shape[1]):
-        idx = np.where(np.logical_and(ind >= i * nSymbols, ind < (i + 1) * nSymbols))[0]
-        if len(idx) != 0:
-            grid[ind[idx] - i * nSymbols, i] = vals[idx]
+    nSC = grid.shape[0]
+    if grid.ndim == 2:
+        for i in range(grid.shape[1]):
+            idx = np.where(np.logical_and(ind >= i * nSC, ind < (i + 1) * nSC))[0]
+            if len(idx) != 0:
+                grid[ind[idx] - i * nSC, i] = vals[idx]
+    else:
+        # 3D grid (multiple antenna ports): flat indices are sc + sym*nSC + port*(nSC*nSym),
+        # matching the port_stride convention used by multi-port index functions (e.g.
+        # nrCSIRSIndices). The 2D case above cannot address this 3rd dimension, so a port >= 1's
+        # indices (which start beyond nSC*nSym) would otherwise never match and be silently
+        # dropped.
+        nSym = grid.shape[1]
+        stride = nSC * nSym
+        for p in range(grid.shape[2]):
+            portIdx = np.where(np.logical_and(ind >= p * stride, ind < (p + 1) * stride))[0]
+            if len(portIdx) == 0:
+                continue
+            localInd = ind[portIdx] - p * stride
+            for i in range(nSym):
+                idx = np.where(np.logical_and(localInd >= i * nSC, localInd < (i + 1) * nSC))[0]
+                if len(idx) != 0:
+                    grid[localInd[idx] - i * nSC, i, p] = vals[portIdx[idx]]
     return vals
