@@ -124,6 +124,11 @@ def _generateSSB(
     reservations: list[nrPDSCHReservedConfig] = []
 
     for beamIdx, on in enumerate(ssb.TransmittedBlocks):
+        if not on:
+            # Only actually-transmitted positions (ssb-PositionsInBurst) are off-limits to
+            # PDSCH -- an untransmitted candidate position is free for the scheduler to use.
+            continue
+
         rsv = nrPDSCHReservedConfig()
         rsv.PRBSet = list(range(ssb.PRBOffset, ssb.PRBOffset + _SSB_RB))
         absSym = int(startSymbols[beamIdx])
@@ -131,7 +136,7 @@ def _generateSSB(
         rsv.Period = ssb.Period
         reservations.append(rsv)
 
-        if not on or absSym // symPerSlot != relSlot:
+        if absSym // symPerSlot != relSlot:
             continue
         startSymbol = absSym % symPerSlot
 

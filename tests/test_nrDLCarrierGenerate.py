@@ -173,6 +173,38 @@ def test_reservedprb_does_not_accumulate_across_repeated_calls():
     assert len(pdsch.PDSCH.ReservedPRB) == 1  # just the one CORESET reservation, not 5x
 
 
+def test_pdsch_reclaims_ssb_band_when_no_beam_transmits_there():
+    # Regression test: an earlier version built a ReservedPRB entry for every one of the Lmax
+    # candidate beam positions regardless of TransmittedBlocks, so PDSCH was blocked out of the
+    # SSB's PRB range on every slot, even ones where no beam was actually configured to
+    # transmit. Only *actually-transmitted* positions (ssb-PositionsInBurst) are off-limits --
+    # an untransmitted candidate position is free for the scheduler.
+    cfg = nrDLCarrierConfig()
+    cfg.Carrier = _carrier()
+    cfg.SSBurst = nrSSBurstConfig()
+    cfg.SSBurst.BlockPattern = "B"
+    cfg.SSBurst.TransmittedBlocks = [1, 0, 0, 0, 0, 0, 0, 0]  # only beam 0 active
+    cfg.SSBurst.PRBOffset = 10
+    cfg.SSBurst.Period = 20
+
+    pdsch = nrWavegenPDSCHConfig()
+    pdsch.PDSCH.PRBSet = list(range(52))
+    pdsch.PDSCH.SymbolAllocation = [0, 14]
+    pdsch.Codeword = np.random.default_rng(0).integers(0, 2, 52 * 12 * 14 * 2)
+    cfg.PDSCH = [pdsch]
+
+    totalSC = 12 * cfg.Carrier.NSizeGrid
+    ssbSC = set(range(10 * 12, 10 * 12 + 240))
+
+    # Slot 1: beam 0 (the only active one) doesn't land here -- the SSB's frequency range
+    # should be fully usable by PDSCH (240 subcarriers x 13 non-DMRS symbols = 3120 REs).
+    _, info = nrDLCarrierGenerate(cfg, 1)
+    assert len(info["SSB"]) == 0
+    pdschInd = info["PDSCH"][0]["indices"]
+    sc = pdschInd % totalSC
+    assert np.isin(sc, list(ssbSC)).sum() == 240 * 13
+
+
 def test_periodicity_gating():
     cfg = nrDLCarrierConfig()
     cfg.Carrier = _carrier()

@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pytest
 
-from py3gpp import nrCarrierConfig, nrPDSCHConfig, nrPDSCHIndices, nrPDSCHReservedConfig
+from py3gpp import nrCarrierConfig, nrPDSCHConfig, nrPDSCHIndices, nrPDSCHReservedConfig, nrSSBurstStartSymbols
 
 
 def run_nr_pdschindices_reserved(cfg, eng, expect_exclusion=None):
@@ -87,6 +87,56 @@ def test_nr_pdschindices_reserved_symbol_subset_matlab(eng):
     cfg["ReservedPRBSet"] = list(range(20, 40))
     cfg["ReservedSymbolSet"] = [2, 3, 4, 5]
     run_nr_pdschindices_reserved(cfg, eng, expect_exclusion=True)
+
+
+def test_nr_pdschindices_reserved_ssb_shaped_matlab(eng):
+    # The exact shape of a real SS/PBCH block reservation: 20 contiguous PRBs (240 subcarriers)
+    # x 4 consecutive OFDM symbols (TS 38.211 7.4.3.1) -- not just a frequency-only or
+    # symbol-subset reservation like the simpler cases above. The start symbol itself comes from
+    # nrSSBurstStartSymbols (the same function nrDLCarrierGenerate's _generateSSB calls to build
+    # this exact reservation for a real beam), not an arbitrary stand-in value, so this exercises
+    # the real SSB-placement pipeline's shape, not just a coincidentally-similar block. Also
+    # confirms the *entire* block is excluded (960 REs), not just the REs that would actually
+    # carry PSS/SSS/PBCH/PBCH-DMRS content -- matching the real spec rule that the whole block is
+    # off-limits to PDSCH.
+    eng.cd(os.path.dirname(__file__))
+    cfg = _base_cfg()
+    ssb_prb_offset = 10
+    ssb_start_symbol = int(nrSSBurstStartSymbols("B", 8)[0])  # beam 0's real start symbol, Case B
+    cfg["ReservedPRBSet"] = list(range(ssb_prb_offset, ssb_prb_offset + 20))
+    cfg["ReservedSymbolSet"] = list(range(ssb_start_symbol, ssb_start_symbol + 4))
+    run_nr_pdschindices_reserved(cfg, eng, expect_exclusion=True)
+
+    carrier = nrCarrierConfig()
+    carrier.SubcarrierSpacing = cfg["SubcarrierSpacing"]
+    carrier.NSizeGrid = cfg["NSizeGrid"]
+    carrier.NStartGrid = cfg["NStartGrid"]
+    carrier.NSlot = cfg["NSlot"]
+    pdsch = nrPDSCHConfig()
+    pdsch.PRBSet = cfg["PRBSet"]
+    pdsch.SymbolAllocation = cfg["SymbolAllocation"]
+
+    plain = nrPDSCHIndices(carrier, pdsch)
+    rsv = nrPDSCHReservedConfig()
+    rsv.PRBSet = cfg["ReservedPRBSet"]
+    rsv.SymbolSet = cfg["ReservedSymbolSet"]
+    pdsch.ReservedPRB = [rsv]
+    reserved = nrPDSCHIndices(carrier, pdsch)
+
+    # Check the actual RE positions removed, not just how many: every (subcarrier, symbol) pair
+    # inside the SSB's own 240sc x 4sym footprint, and nothing outside it.
+    totalSC = carrier.NSizeGrid * 12
+    scStart = ssb_prb_offset * 12
+    expectedRemoved = {
+        sc + sym * totalSC
+        for sc in range(scStart, scStart + 240)
+        for sym in range(ssb_start_symbol, ssb_start_symbol + 4)
+    }
+    actuallyRemoved = set(plain.tolist()) - set(reserved.tolist())
+
+    assert expectedRemoved.issubset(set(plain.tolist())), "expected SSB REs weren't even in the unreserved grid"
+    assert actuallyRemoved == expectedRemoved, "reservation removed the wrong set of REs, not just the wrong count"
+    assert set(reserved.tolist()).isdisjoint(expectedRemoved)
 
 
 def test_nr_pdschindices_reserved_nonzero_symstart_matlab(eng):
