@@ -66,11 +66,11 @@ class nrWavegenPDCCHConfig:
     """PDCCH instance for `nrDLCarrierGenerate`. No AggregationLevel/AllocatedCandidate/payload
     fields exist on the real `nrPDCCHConfig` either (py3gpp has no search-space candidate hashing,
     `nrPDCCHSpace`) -- the caller picks the first CCE directly and supplies already-DCI-encoded
-    bits (e.g. via `nrDCIEncode`)."""
+    bits (e.g. via `nrDCIEncode`). Monitoring periodicity comes from
+    `PDCCH.SearchSpace.SlotPeriodAndOffset` (real MATLAB field), not a field on this wrapper."""
 
     def __init__(self) -> None:
         self.PDCCH: nrPDCCHConfig | None = None
-        self.Period: int = 1  # slots
         self.CCEStart: int = 0
         self.Bits: NDArray[np.int_] = np.zeros(0, dtype=int)
 
@@ -195,12 +195,35 @@ def nrDLCarrierGenerate(cfgObj: nrDLCarrierConfig, nSlot: int) -> tuple[NDArray[
             nrSetResources(ind, grid, vals)
         info["SSB"] = beams
 
+    # CORESET.ControlResourceSetId -> its SearchSpace's StartSymbolWithinSlot (real MATLAB keeps
+    # this on nrSearchSpaceConfig, not the CORESET itself -- see nrPDCCHResources' docstring).
+    # Used both for PDCCH's own generation below and for building matching PDSCH reservations.
+    coresetStartSymbols: dict[int, int] = {
+        pdcch.PDCCH.SearchSpace.ControlResourceSetId: pdcch.PDCCH.SearchSpace.StartSymbolWithinSlot
+        for pdcch in cfgObj.PDCCH
+        if pdcch.PDCCH is not None
+    }
+    # Same idea for periodicity: a CORESET is only actually monitored (and so only actually
+    # needs excluding from PDSCH) on the slots its own search space is monitored on. Default to
+    # every slot ((1, 0)) for a CORESET no configured PDCCH references, since that's the safe
+    # assumption.
+    coresetPeriods: dict[int, tuple[int, int]] = {
+        pdcch.PDCCH.SearchSpace.ControlResourceSetId: pdcch.PDCCH.SearchSpace.SlotPeriodAndOffset
+        for pdcch in cfgObj.PDCCH
+        if pdcch.PDCCH is not None
+    }
+
     for pdcch in cfgObj.PDCCH:
-        if pdcch.PDCCH is None or nSlot % pdcch.Period != 0:
+        if pdcch.PDCCH is None:
             continue
-        aggLevel = max(1, len(pdcch.Bits) // 72)
+        period, offset = pdcch.PDCCH.SearchSpace.SlotPeriodAndOffset
+        if nSlot % period != offset:
+            continue
+        # 1 CCE = 6 REGs; each REG has 9 data REs (12 - 3 DM-RS), QPSK -> 6*9*2 = 108 bits/CCE.
+        aggLevel = max(1, len(pdcch.Bits) // 108)
         cceIndices = list(range(pdcch.CCEStart, pdcch.CCEStart + aggLevel))
-        contentInd, dmrsInd = nrPDCCHResources(carrier, pdcch.PDCCH.CORESET, cceIndices)
+        startSymbol = pdcch.PDCCH.SearchSpace.StartSymbolWithinSlot
+        contentInd, dmrsInd = nrPDCCHResources(carrier, pdcch.PDCCH.CORESET, cceIndices, startSymbol)
         sym = nrPDCCH(pdcch.Bits, pdcch.PDCCH.RNTI, pdcch.PDCCH.CORESET.ControlResourceSetId)
         nrSetResources(contentInd, grid, sym)
         info["PDCCH"].append({"indices": contentInd, "dmrsIndices": dmrsInd})
@@ -208,7 +231,12 @@ def nrDLCarrierGenerate(cfgObj: nrDLCarrierConfig, nSlot: int) -> tuple[NDArray[
     for pdsch in cfgObj.PDSCH:
         if nSlot % pdsch.Period != 0:
             continue
-        coresetReservations = [nrCORESETReservedConfig(cfgObj.CORESET[cid]) for cid in pdsch.ReservedCORESET]
+        coresetReservations = []
+        for cid in pdsch.ReservedCORESET:
+            ctrlId = cfgObj.CORESET[cid].ControlResourceSetId
+            rsv = nrCORESETReservedConfig(cfgObj.CORESET[cid], coresetStartSymbols.get(ctrlId, 0))
+            rsv.Period, rsv.Offset = coresetPeriods.get(ctrlId, (1, 0))
+            coresetReservations.append(rsv)
         pdsch.PDSCH.ReservedPRB = ssbReservations + coresetReservations + list(pdsch.ReservedPRB)
 
         ind = nrPDSCHIndices(carrier, pdsch.PDSCH)

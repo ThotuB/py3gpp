@@ -266,6 +266,7 @@ class nrPDSCHReservedConfig:
         self._PRBSet: list[int] = []
         self._SymbolSet: list[int] = []
         self._Period: int | None = None
+        self._Offset: int = 0
 
     @property
     def PRBSet(self) -> list[int]:
@@ -291,6 +292,18 @@ class nrPDSCHReservedConfig:
     def Period(self, value: int | None) -> None:
         assert value is None or value > 0, "The value must be a positive integer or None"
         self._Period = value
+
+    @property
+    def Offset(self) -> int:
+        """Slot offset (w.r.t. Period) at which this pattern's SymbolSet applies; mirrors the
+        second element of real MATLAB's nrSearchSpaceConfig.SlotPeriodAndOffset. Ignored when
+        Period is None."""
+        return self._Offset
+
+    @Offset.setter
+    def Offset(self, value: int) -> None:
+        assert value >= 0, "The value must be a nonnegative integer"
+        self._Offset = value
 
 
 class PDSCHConfigBase:
@@ -461,7 +474,7 @@ def _activePRBPerSymbol(
         # Symbols/PRBs can be specified over a multi-slot pattern; project them onto this slot's
         # local 0..nslotsymb-1 symbol range, honoring the pattern's periodicity (no period means
         # the pattern doesn't repeat, so it only lines up with its own absolute slot position).
-        offset = (nslot % rsv.Period if rsv.Period else nslot) * nslotsymb
+        offset = ((nslot - rsv.Offset) % rsv.Period if rsv.Period else nslot) * nslotsymb
         reservedSymbols = {s - offset for s in rsv.SymbolSet if 0 <= s - offset < nslotsymb}
         reservedPRBs = {p for p in rsv.PRBSet if p in prbset}
         for sym in reservedSymbols:

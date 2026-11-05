@@ -101,8 +101,9 @@ def nrCORESETReservedConfig(coreset: nrCORESETConfig, startSymbol: int = 0) -> n
     """Build a PDSCH ReservedPRB entry covering a CORESET's whole configured region (TS 38.214
     Section 5.1.4.1: PDSCH must assume the entire configured CORESET region is unavailable, not
     just whichever CCEs end up carrying a DCI in a given monitoring occasion, since the UE can't
-    know that in advance). Set the returned config's Period if the CORESET is monitored on a
-    recurring pattern of slots; leave it unset for a reservation tied to this exact slot only."""
+    know that in advance). Set the returned config's Period/Offset (e.g. from the associated
+    nrSearchSpaceConfig.SlotPeriodAndOffset) if the CORESET is monitored on a recurring pattern of
+    slots; leave Period unset for a reservation tied to this exact slot only."""
     rsv = nrPDSCHReservedConfig()
     rsv.PRBSet = coreset.PRBSet
     rsv.SymbolSet = list(range(startSymbol, startSymbol + coreset.Duration))
@@ -117,6 +118,8 @@ class nrSearchSpaceConfig:
         self._ControlResourceSetId: int = 0
         self._SearchSpaceType: Literal["common", "ue-specific"] = "common"
         self._NumCandidates: dict[int, int] = {1: 0, 2: 0, 4: 0, 8: 0, 16: 0}
+        self._StartSymbolWithinSlot: int = 0
+        self._SlotPeriodAndOffset: tuple[int, int] = (1, 0)
 
     @property
     def SearchSpaceId(self) -> int:
@@ -154,6 +157,30 @@ class nrSearchSpaceConfig:
         assert set(value.keys()) <= {1, 2, 4, 8, 16}, "Keys must be aggregation levels in {1, 2, 4, 8, 16}"
         assert all(v in (0, 1, 2, 3, 4, 5, 6, 8) for v in value.values()), "Values must be in {0,1,2,3,4,5,6,8}"
         self._NumCandidates = value
+
+    @property
+    def StartSymbolWithinSlot(self) -> int:
+        """First symbol of the CORESET location in each monitored slot (TS 38.213 10.1)."""
+        return self._StartSymbolWithinSlot
+
+    @StartSymbolWithinSlot.setter
+    def StartSymbolWithinSlot(self, value: int) -> None:
+        assert 0 <= value <= 13, "The value must be 0..13"
+        self._StartSymbolWithinSlot = value
+
+    @property
+    def SlotPeriodAndOffset(self) -> tuple[int, int]:
+        """Monitoring periodicity and offset, in slots: (period, offset). The search space is
+        monitored on slots where nslot % period == offset."""
+        return self._SlotPeriodAndOffset
+
+    @SlotPeriodAndOffset.setter
+    def SlotPeriodAndOffset(self, value: Sequence[int]) -> None:
+        assert len(value) == 2, "The value must be a 2-element [period, offset] sequence"
+        period, offset = value
+        assert period > 0, "The period must be a positive integer"
+        assert 0 <= offset < period, "The offset must be nonnegative and less than the period"
+        self._SlotPeriodAndOffset = (int(period), int(offset))
 
 
 class nrPDCCHConfig:
@@ -195,9 +222,16 @@ def nrPDCCHDecode(sym: NDArray[np.complex128], rnti: int, nid: int) -> NDArray[n
 
 
 def nrPDCCHResources(
-    carrier: nrCarrierConfig, coreset: nrCORESETConfig, cce_indices: Sequence[int]
+    carrier: nrCarrierConfig, coreset: nrCORESETConfig, cce_indices: Sequence[int], startSymbol: int = 0
 ) -> tuple[NDArray[np.int_], NDArray[np.int_]]:
-    """Generate PDCCH and PDCCH DM-RS resources."""
+    """Generate PDCCH and PDCCH DM-RS resources.
+
+    startSymbol is the CORESET's first symbol within the slot (real MATLAB models this as
+    nrSearchSpaceConfig.StartSymbolWithinSlot, consumed internally by the richer
+    nrPDCCHResources(carrier, pdcch) overload; py3gpp's narrower signature -- bare coreset +
+    explicit cce_indices, no search-space candidate hashing -- takes it as a direct parameter
+    instead).
+    """
     if coreset.CCEREGMapping == "interleaved":
         raise NotImplementedError("interleaved CCE-to-REG mapping is not yet implemented")
 
@@ -219,7 +253,7 @@ def nrPDCCHResources(
         for reg in range(reg_start, reg_start + 6):
             assert 0 <= reg < n_reg, f"REG index {reg} (from CCE {cce}) is out of range for this CORESET"
             prb = prb_set[reg // D]
-            symbol = reg % D
+            symbol = startSymbol + reg % D
             base = prb * 12 + symbol * total_subcarriers
             pdcch_re.extend(base + k for k in data_local)
             dmrs_re.extend(base + k for k in dmrs_local)
