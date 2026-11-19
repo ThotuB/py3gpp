@@ -15,6 +15,60 @@ if TYPE_CHECKING:
     from py3gpp.ul.ch.phy.pusch import nrPUSCHConfig
 
 
+# TS 38.211 Table 6.4.1.1.3-3, Type B, single-symbol DM-RS: duration (number of allocated
+# symbols) -> base position (relative to the start of the allocation, not the slot) for
+# additional positions 0,1,2,3. No frequency-hopping variant (py3gpp's nrPUSCHConfig has no
+# intra-slot hopping support).
+_PUSCH_DMRS_TYPEB_SINGLE: dict[int, list[list[int]]] = {
+    1: [[0], [0], [0], [0]],
+    2: [[0], [0], [0], [0]],
+    3: [[0], [0], [0], [0]],
+    4: [[0], [0], [0], [0]],
+    5: [[0], [0, 4], [0, 4], [0, 4]],
+    6: [[0], [0, 4], [0, 4], [0, 4]],
+    7: [[0], [0, 4], [0, 4], [0, 4]],
+    8: [[0], [0, 6], [0, 3, 6], [0, 3, 6]],
+    9: [[0], [0, 6], [0, 3, 6], [0, 3, 6]],
+    10: [[0], [0, 8], [0, 4, 8], [0, 3, 6, 9]],
+    11: [[0], [0, 8], [0, 4, 8], [0, 3, 6, 9]],
+    12: [[0], [0, 10], [0, 5, 10], [0, 3, 6, 9]],
+    13: [[0], [0, 10], [0, 5, 10], [0, 3, 6, 9]],
+    14: [[0], [0, 10], [0, 5, 10], [0, 3, 6, 9]],
+}
+
+# TS 38.211 Table 6.4.1.1.3-4, Type B, double-symbol DM-RS: duration -> base position for
+# additional positions 0,1 (positions 2,3 are not defined for double-symbol DM-RS, same as Type A).
+_PUSCH_DMRS_TYPEB_DOUBLE: dict[int, list[list[int]]] = {
+    5: [[0], [0]],
+    6: [[0], [0]],
+    7: [[0], [0]],
+    8: [[0], [0, 5]],
+    9: [[0], [0, 5]],
+    10: [[0], [0, 7]],
+    11: [[0], [0, 7]],
+    12: [[0], [0, 9]],
+    13: [[0], [0, 9]],
+    14: [[0], [0, 9]],
+}
+
+
+def _puschDMRSSymsTypeB(duration: int, add_pos: int, dmrs_len: int) -> NDArray[np.int_]:
+    """DM-RS symbol positions for Mapping Type B, relative to the start of the PUSCH allocation
+    (not the start of the slot -- unlike Type A). Caller shifts by SymbolAllocation[0]."""
+    if dmrs_len == 1:
+        assert (
+            duration in _PUSCH_DMRS_TYPEB_SINGLE
+        ), f"Mapping type B single-symbol DM-RS is not defined for a {duration}-symbol allocation"
+        return np.array(_PUSCH_DMRS_TYPEB_SINGLE[duration][add_pos], dtype=int)
+
+    assert add_pos in (0, 1), "add_pos has to be [0, 1] for double-symbol"
+    assert (
+        duration in _PUSCH_DMRS_TYPEB_DOUBLE
+    ), f"Mapping type B double-symbol DM-RS is not defined for a {duration}-symbol allocation"
+    base = np.array(_PUSCH_DMRS_TYPEB_DOUBLE[duration][add_pos], dtype=int)
+    return np.concatenate((base[np.newaxis], base[np.newaxis] + 1), axis=0).T.ravel()
+
+
 def nrPUSCHDMRS(cfg: nrPUSCHConfig, carrier: nrCarrierConfig) -> NDArray[np.complex128]:
     """Generate PUSCH DM-RS symbols."""
     if cfg.DMRS.DMRSConfigurationType == 1:
@@ -48,15 +102,24 @@ def nrPUSCHDMRS(cfg: nrPUSCHConfig, carrier: nrCarrierConfig) -> NDArray[np.comp
 
 # LUT for DMRS occupied symbols positions
 def PUSCHDMRSSyms(cfg: nrPUSCHConfig) -> NDArray[np.int_]:
-    assert cfg.MappingType in ["A"], "Mapping type B is not yet implemented"
+    add_pos = cfg.DMRS.DMRSAdditionalPosition
+    dmrs_len = cfg.DMRS.DMRSLength
+
+    if cfg.MappingType == "B":
+        # TS 38.211 Table 6.4.1.1.3-3/-4, Type B: positions are relative to the start of the
+        # allocation itself (SymbolAllocation[0]), not the slot -- unlike Type A below, which is
+        # always anchored to a fixed slot-absolute symbol regardless of where the allocation
+        # starts. This is exactly what a late-starting allocation (e.g. a TDD Special slot's
+        # uplink tail) needs.
+        occupied_syms = _puschDMRSSymsTypeB(cfg.SymbolAllocation[1], add_pos, dmrs_len)
+        return occupied_syms + cfg.SymbolAllocation[0]
+
     l1 = 11
     typeA_pos = cfg.DMRS.DMRSTypeAPosition
     # TS 38.211 Table 6.4.1.1.3-3/-4: indexed by l_d, the duration from the start of the slot to
     # the end of the PUSCH allocation -- not just the number of allocated symbols -- so symStart
     # must be included when mapping type A does not start at symbol 0.
     sym_alloc = cfg.SymbolAllocation[0] + cfg.SymbolAllocation[1]
-    add_pos = cfg.DMRS.DMRSAdditionalPosition
-    dmrs_len = cfg.DMRS.DMRSLength
 
     occupied_syms = np.array([typeA_pos], dtype=int)
 

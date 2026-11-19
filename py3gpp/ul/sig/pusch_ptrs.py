@@ -102,6 +102,11 @@ def nrPUSCHPTRS(carrier: nrCarrierConfig, cfg: nrPUSCHConfig) -> NDArray[np.comp
     """Generate PUSCH PT-RS symbols (single-layer, CP-OFDM only)."""
     if cfg.TransformPrecoding == "enabled":
         raise NotImplementedError("Transform-precoded (DFT-s-OFDM) PT-RS is not yet implemented")
+    # _ptrsSyms resets the PT-RS pattern at cfg.DMRS.DMRSTypeAPosition, which is a Type-A-only
+    # concept (TS 38.211 6.4.1.2.2.1's Type B reset rule is different, anchored to the allocation
+    # start) -- not yet ported, so guard it loudly instead of silently misplacing PT-RS.
+    if cfg.MappingType == "B":
+        raise NotImplementedError("PUSCH PT-RS for Mapping Type B is not yet implemented")
     if not cfg.EnablePTRS:
         return np.zeros(0, dtype=np.complex128)
 
@@ -126,6 +131,8 @@ def nrPUSCHPTRSIndices(carrier: nrCarrierConfig, cfg: nrPUSCHConfig) -> NDArray[
     """Generate PUSCH PT-RS resource element indices (single-layer, CP-OFDM only)."""
     if cfg.TransformPrecoding == "enabled":
         raise NotImplementedError("Transform-precoded (DFT-s-OFDM) PT-RS is not yet implemented")
+    if cfg.MappingType == "B":
+        raise NotImplementedError("PUSCH PT-RS for Mapping Type B is not yet implemented")
     if not cfg.EnablePTRS:
         return np.zeros(0, dtype=int)
 

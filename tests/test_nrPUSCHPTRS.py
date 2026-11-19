@@ -72,3 +72,16 @@ def test_nrPUSCHPTRS_transform_precoding_raises_not_implemented():
     pusch.TransformPrecoding = "enabled"
     with pytest.raises(NotImplementedError):
         nrPUSCHPTRS(carrier, pusch)
+
+
+def test_nrPUSCHPTRS_mapping_type_b_raises_not_implemented():
+    # DM-RS now supports Type B, but PT-RS's own symbol-placement still resets at
+    # DMRSTypeAPosition (a Type-A-only concept) -- guard against silently-wrong Type B PT-RS.
+    carrier = nrCarrierConfig()
+    pusch = nrPUSCHConfig()
+    pusch.PRBSet = list(range(52))
+    pusch.EnablePTRS = True
+    pusch.MappingType = "B"
+    pusch.SymbolAllocation = [12, 2]
+    with pytest.raises(NotImplementedError):
+        nrPUSCHPTRS(carrier, pusch)
